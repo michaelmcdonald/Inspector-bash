@@ -40,7 +40,7 @@ Inspector Gadget will not replace actual investigative work on a server in any f
 
 Question: Why doesn’t Inspector Gadget have X feature?
 
-The script is constantly being worked on; however at some point I had to make a decision to call it feature complete and push it out into the open. As time goes on I will be updating the script to add additional functionality and compatibility. See the ROADMAP file for additional information about planned features.
+The script is constantly being worked on; however at some point I had to make a decision to call it feature complete and push it out into the open. As time goes on I will be updating the script to add additional functionality and compatibility. See the ROADMAP.txt file for additional information about planned features.
 
 Question: It's not working on this system! What gives?!
 
