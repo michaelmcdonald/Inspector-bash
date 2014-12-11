@@ -18,7 +18,7 @@ Download/Installation
 
 The source for Inspector Gadget is open and available via Github. Feel free to clone the repo, make changes, and offer up pull requests for any features you would like to see. The simplest and shortest method of using Inspector Gadget is:
 
-    bash <(curl -s inspector.sh)
+    bash <(curl -sL inspector.sh)
 
 Alternatively you can run it by downloading it locally:
 
