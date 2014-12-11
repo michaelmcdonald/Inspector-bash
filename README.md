@@ -28,7 +28,7 @@ Alternatively you can run it by downloading it locally:
 Of course, you can add the execute bit (chmod +x inspector.sh) so you can execute it without calling bash directly.
 
 FAQ
-__
+--
 
 Question: Will Inspector Gadget change anything on my system?
 
