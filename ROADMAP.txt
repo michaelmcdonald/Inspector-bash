@@ -14,9 +14,11 @@ VERSION 1.1
 VERSION 2.0
 ├─Checks for Nginx
 ├─Checks for Varnish
+├─Include software RAID checks
 ├─Display server date/time zone
 ├─Identify firewall in use
-└─Display # people logged in
+├─Display # people logged in
+└─Correct / setup global variables for use in functions
 
 VERSION 3.0
 ├─Arguments to run specific function groups

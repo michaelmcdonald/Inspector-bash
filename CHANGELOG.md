@@ -1,3 +1,7 @@
+**1.05 -- 12/14/2014**
+
+Fixed the regex for the Apache version number so that it would show up properly on CentOS 7 boxes.
+
 **1.04 -- 12/14/2014**
 
 Corrected the issue where the PHP memory_limit value was only report in "MB". Now it properly grabs the 

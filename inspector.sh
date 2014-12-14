@@ -3,7 +3,7 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.04
+# VERSION: 1.05
 # PURPOSE: to examine various aspects of a Linux system and provide 
 #          quick access to that information in a clean format
 
@@ -51,7 +51,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.04           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.05           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
@@ -456,8 +456,9 @@ APACHEFULLINFO=$(httpd -V)
 # Grabs the netstat info for later parsing to find the number of active connections
 NETSTATINFO=$(netstat -nap)
 
-# Parses the netstat info and provides us with only the number of TCP connections
-NUMOFCONNS=$(awk '/:80/ {++c} END {print c}' <<< "$NETSTATINFO")
+# Not including this under Apache. Will examine adding it to a "Traffic" section later on
+## Parses the netstat info and provides us with only the number of TCP connections
+#NUMOFCONNS=$(awk '/:80/ {++c} END {print c}' <<< "$NETSTATINFO")
 
 # Get the entire Apache version number from the string in the $APACHEINFO variable
 APACHEVERSION=$(awk -F[/\ ] '/Server version/ {print $4}'i <<< $APACHEFULLINFO)
@@ -469,7 +470,8 @@ APACHEMPM=$(awk -F[:] '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Server MPM/ {print $2}
 # This parses the Apache version and breaks it down into the individual components of the version number with each part
 # being stored as a separate variable. These individual components are not being utilized but provide the ability to
 # easily compare the major / minor version numbers for version checking.
-[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+#[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9]+)).*$ ]] &&
 APACHEENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 APACHEMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 APACHEMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
@@ -486,7 +488,7 @@ echo "${APACHEINFO}Version In Use:${RESET} $APACHEENTIREVERSION"
 
 echo "${APACHEINFO}MPM Being Used:${RESET} $APACHEMPM"
 
-echo "${APACHEINFO}Connections In:${RESET} $NUMOFCONNS"
+#echo "${APACHEINFO}Connections In:${RESET} $NUMOFCONNS"
 
 }
 
@@ -696,6 +698,7 @@ else
 systeminfo
 memoryinfo
 diskinfo
+apacheinfo
 
 fi
 
