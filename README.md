@@ -10,7 +10,7 @@ Compatibility:
 * Apache 2.2 / 2.4
 * PHP 5.x and higher (not tested on 4.x, yet)
 * CentOS 5.x, 6.x, 7.x (not tested on 4.x, yet)
-* Ubuntu 12.x, 14.x
+* Ubuntu systems are NOT supported at this time 
 * Plesk systems are NOT supported at this time
 
 Download/Installation

@@ -8,17 +8,23 @@ VERSION 1.1
 ├─Verify buffer pool logic (name differences across versions)
 ├─Logic to test for memory_limit M or G
 ├─Test for global PHP.ini file
+├─Logic for Apache installed vs. not (which functions run)
 └─Logic for cPanel installed vs. not (which functions run)
 
 VERSION 2.0
 ├─Checks for Nginx
 ├─Checks for Varnish
 ├─Display server date/time zone
+├─Identify firewall in use
 └─Display # people logged in
 
 VERSION 3.0
 ├─Arguments to run specific function groups
-└─Verbose mode (include MySQLtune, Traffic, Security)
+├─Verbose mode (include MySQLtune, Traffic, Security)
+└─Ubuntu support
+  ├─Variations in MySQL commands / file locations
+  ├─Variations in PHP commands / file locations
+  └─Variations in Apache commands / file locations
 
 VERSION 4.0
 └─Menu based interface for function choice(s)

@@ -3,7 +3,7 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.00
+# VERSION: 1.04
 # PURPOSE: to examine various aspects of a Linux system and provide 
 #          quick access to that information in a clean format
 
@@ -51,7 +51,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.00           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.04           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
@@ -71,14 +71,18 @@ echo " ${YELLOW}                   |___/ ${RESET}      "
 # Function for all System Info related information
 function systeminfo {
 
-# Capture the relevant information for the CPUs on the system
-CPUINFO=$(cat /proc/cpuinfo)
+
+# This is currently deprecated. Leaving for historical purposes
+## Capture the relevant information for the CPUs on the system
+#CPUINFO=$(cat /proc/cpuinfo)
 
 # Identify the specific processor model
 PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2}' /proc/cpuinfo)
 
-# Count how many cores are on the system
-PROCESSORCOUNT=$(awk '$1 ~ /processor/ {++c} END {print c}' FS=: <<< $CPUINFO)
+# This is currently deprecated. Leaving for historical purposes
+## Count how many cores are on the system
+#PROCESSORCOUNT=$(awk '$1 ~ /processor/ {++c} END {print c}' FS=: <<< $CPUINFO)
+PROCESSORCOUNT=$(getconf _NPROCESSORS_ONLN)
 
 # Record the current 1 min load average
 LOADAVERAGE=$(cat /proc/loadavg | awk '{print $1}')
@@ -331,9 +335,6 @@ function phpinfo {
 # Capture the output of the command php -v for later use
 PHPVOUTPUT=$(php -v 2>/dev/null)
 
-# Capture the output of the command to display what PHP handler is currently being used
-PHPREBUILD=$(/usr/local/cpanel/bin/rebuild_phpconf --current 2>/dev/null)
-
 # Capture the memory_limit line from the global php.ini
 PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' /usr/local/lib/php.ini)
 
@@ -345,22 +346,84 @@ echo "------------\\${PHPINFO} ${UNDERLINE}PHP INFO${RESET} \\------------------
 echo
 
 
-# Grab the version of PHP currently installed on the system
-PHPVERSION=$(awk ' /built/ {print $2}'i <<< "$PHPVOUTPUT")
+## Grab the version of PHP currently installed on the system
+[[ $PHPVOUTPUT =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+PHPENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
+PHPMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
+PHPMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
+PHPBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 
 # Display the PHP version
-echo "${PHPINFO}Version In Use:${RESET} $PHPVERSION"
+echo "${PHPINFO}Version In Use:${RESET} $PHPENTIREVERSION"
 
-# Grab the handler for PHP currently being used on the system
-PHPHANDLER=$(awk '/PHP5/ {print $3}'i <<< "$PHPREBUILD")
+# Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
+CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
 
-# Display the PHP handler
-echo "${PHPINFO}Handler In Use:${RESET} $PHPHANDLER"
+# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
+if [[ ! -z "$CPANELTEST" ]]; then
+
+PHPCONF=$(cat /usr/local/apache/conf/php.conf 2>/dev/null)
+
+CGIHANDLER=$(awk 'match($0,/cgi-sys/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+SUPHPHANDLER=$(awk 'match($0,/suphp/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+DSOHANDLER=$(awk 'match($0,/libphp5/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+FCGIHANDLER=$(awk 'match($0,/fcgid/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+
+
+if [[ ! -z "$FCGIHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} fCGI"
+
+elif [[ ! -z "$SUPHPHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
+
+elif [[ ! -z "$DSOHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} DSO"
+
+elif [[ ! -z "$CGIHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} CGI"
+
+fi
+
+else
+
+PHPCONF=$(cat /etc/httpd/conf.d/php.conf 2>/dev/null)
+
+CGIHANDLER=$(awk 'match($0,/cgi-sys/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+SUPHPHANDLER=$(awk 'match($0,/suphp/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+DSOHANDLER=$(awk 'match($0,/libphp5/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+FCGIHANDLER=$(awk 'match($0,/fcgid/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
+
+if [[ ! -z "$FCGIHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} fCGI"
+
+elif [[ ! -z "$SUPHPHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
+
+elif [[ ! -z "$DSOHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} DSO"
+
+elif [[ ! -z "$CGIHANDLER" ]]; then
+
+echo "${PHPINFO}Handler In Use:${RESET} CGI"
+
+fi
+
+fi
+
 
 # Grabs just the value for the memory_limit
 [[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
 PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit 
 
+[[ $PHPGLOBALCONF =~ ([A-Za-z]).*$ ]] &&
+PHPMEMLIMITDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
 # ************************************************************************************************************
 # **NOTE** this does NOT (yet) know if the memory limit is using M or G. Thus if a client has a memory_limit 
@@ -368,7 +431,7 @@ PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit
 # ************************************************************************************************************
 
 # Display the PHP memory_limit value
-echo "${PHPINFO}Memory Limit #:${RESET} $PHPMEMLIMIT MB"
+echo "${PHPINFO}Memory Limit #:${RESET} $PHPMEMLIMIT $PHPMEMLIMITDENOM"
 
 }
 
