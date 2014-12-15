@@ -4,7 +4,6 @@ INSPECTOR GADGET ROADMAP
 VERSION 1.1
 ├─Logic for PHP 4
 ├─Logic for MySQL 4
-├─Checks for my.cnf existence (if not there, display message)
 ├─Verify buffer pool logic (name differences across versions)
 ├─Logic to test for memory_limit M or G
 ├─Test for global PHP.ini file
