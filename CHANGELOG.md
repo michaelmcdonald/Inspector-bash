@@ -1,3 +1,8 @@
+**1.09 -- 12/15/2014**
+
+Altered what the MYSQLTEST function looked for so as to better work with Unmanaged servers
+and ensure that if Apache / PHP / MySQL were NOT installed that the script would still run.
+
 **1.08 -- 12/14/2014**
 
 Corrected numerous issues on Cent7 (which likely would crop up on Core-Managed boxes as well).

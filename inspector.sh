@@ -3,7 +3,7 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.08
+# VERSION: 1.09
 # PURPOSE: to examine various aspects of a Linux system and provide
 #          quick access to that information in a clean format
 
@@ -56,7 +56,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.08           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.09           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
@@ -236,7 +236,7 @@ echo "------------\\${MYSQLINFO} ${UNDERLINE}MYSQL INFO${RESET} \\--------------
 echo
 
 # Acquire the MySQL related information that we'll be working with (specifically the version stuff)
-MYSQLOUTPUT=$(mysql -V)
+MYSQLOUTPUT=$(mysql -V 2>/dev/null)
 
 # Parse the output of $MYSQLOUTPUT and acquire just the version information
 MYSQLVERSION=$(awk '{gsub(/,/,""); print $5}'i <<< "$MYSQLOUTPUT")
@@ -369,7 +369,7 @@ echo
 
 
 ## Grab the version of PHP currently installed on the system
-[[ $PHPVOUTPUT =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+[[ $PHPVOUTPUT =~ (([0-9])\.([0-9]+)\.([0-9]+)).*$ ]] &&
 PHPENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 PHPMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 PHPMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
@@ -707,7 +707,7 @@ header_color
 APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
 
 # Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
-MYSQLTEST=$(cat /etc/my.cnf 2>/dev/null)
+MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
 
 PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
 
@@ -742,6 +742,7 @@ phpinfo
 apacheinfo
 
 # If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
+#elif [[ ! -z "$APACHETEST" ]] && [[ -z "$MYSQLTEST" ]]; then
 elif [[ ! -z "$APACHETEST" ]]; then
 systeminfo
 memoryinfo
@@ -749,11 +750,14 @@ diskinfo
 apacheinfo
 
 # If Apache and MySQL are not BOTH installed, and Apache is not installed, check for MySQL. If it is installed, run MySQL safe functions
+#elif [[ ! -z "$MYSQLTEST" ]] && [[ -z "$APACHETEST" ]]; then
 elif [[ ! -z "$MYSQLTEST" ]]; then
 systeminfo
 memoryinfo
 diskinfo
 mysqlinfo
+
+else
 
 # If cPanel, Apache, and MySQL are NOT installed, run basic functions
 systeminfo
