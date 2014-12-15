@@ -3,7 +3,7 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.05
+# VERSION: 1.06
 # PURPOSE: to examine various aspects of a Linux system and provide 
 #          quick access to that information in a clean format
 
@@ -51,7 +51,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.05           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.06           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
@@ -200,13 +200,13 @@ echo "------------\\${MEMORYINFO} ${UNDERLINE}MEMORY INFO${RESET} \\------------
 
 echo
 
-echo "${MEMORYINFO}System Total:${RESET} $TOTALMEMGB GB"
+echo "${MEMORYINFO}System Total:${RESET} $TOTALMEMGB G"
 
-echo "${MEMORYINFO}Current Used:${RESET} $MEMUSED MB"
+echo "${MEMORYINFO}Current Used:${RESET} $MEMUSED M"
 
-echo "${MEMORYINFO}Current Free:${RESET} $MEMTRUEFREE MB"
+echo "${MEMORYINFO}Current Free:${RESET} $MEMTRUEFREE M"
 
-echo "${MEMORYINFO}Current Swap:${RESET} $SWAPUSED MB"
+echo "${MEMORYINFO}Current Swap:${RESET} $SWAPUSED M"
 
 }
 
@@ -254,9 +254,10 @@ echo "${MYSQLINFO}Version In Use:${RESET} $MYSQLENTIREVERSION"
 # Display the buffers header / separation:
 echo "${MYSQLINFO}${UNDERLINE}BUFFER VALUE(s)${RESET}${MYSQLINFO}  ↓↓↓${RESET}"
 
-
 # Acquire the contents of the my.cnf file for parsing
 MYSQLCONF=$(cat /etc/my.cnf)
+
+########## INNODB BUFFER POOL SIZE LOGIC ##############
 
 # Search the $MYSQLCONF variable for the InnoDB Buufer Pool variable. This is just goign to identify if it's there or not
 INNODBPRESENT=$(awk '/innodb_buffer_pool_size/' <<< "$MYSQLCONF")
@@ -264,9 +265,16 @@ INNODBPRESENT=$(awk '/innodb_buffer_pool_size/' <<< "$MYSQLCONF")
 # This will take the value that's assigned to the InnoDB Buffer Pool (should it exist) and store the value
 INNODBVALUE=$(awk -F"=" '/innodb_buffer_pool_size/ {print $2}'i <<< "$MYSQLCONF")
 
-# This calculates what the value would be in MiB since it may be written out in bytes
-MYSQLINNODB=$(awk '{size = $1 / 1024 / 1024 ; print size " MB"} ' <<< "$INNODBVALUE")
+# Grabs just the value for the buffer pool
+[[ $INNODBVALUE =~ (([0-9]+)).*$ ]] &&
+INNODBNUMVALUE=${BASH_REMATCH[1]} # Only the value
 
+#Grabs just the alpha character denoting the memory denomination
+[[ $INNODBVALUE =~ ([A-Za-z]).*$ ]] &&
+INNODBDENOM=${BASH_REMATCH[1]} # The memory denomination being used
+
+# This calculates what the value would be in MiB since it may be written out in bytes
+MYSQLINNODB=$(awk '{size = $1 / 1024 / 1024 ; print size " M"} ' <<< "$INNODBVALUE")
 
 # Examines the my.cnf file, specifically for the InnoDB Buffer Pool Size line. If the line is NOT present it echos the default value
 # associated with MySQL, otherwise it reviews to see if the value is set in MiB or bytes. If Bytes it displays the appropriate value
@@ -276,9 +284,9 @@ if [[ "$INNODBPRESENT" == "" ]];then
 
         echo "${MYSQLINFO}Current InnoDB:${RESET} 128 MB (default)"
 
-elif [[ $INNODBVALUE == *M ]];then
+elif [[ $INNODBVALUE == *M ]] || [[ $INNODBVALUE == *G ]]; then
 
-	echo "${MYSQLINFO}Current InnoDB:${RESET} $INNODBVALUE"
+	echo "${MYSQLINFO}Current InnoDB:${RESET} $INNODBNUMVALUE $INNODBDENOM"
 
 else
 
@@ -286,7 +294,7 @@ else
 
 fi
 
-#######################################################
+########## MYISAM KEY BUFFER SIZE LOGIC ###############
 
 # Search the $MYSQLCONF variable for the InnoDB Buufer Pool variable. This is just goign to identify if it's there or not
 MYISAMPRESENT=$(awk '/key_buffer/' <<< "$MYSQLCONF")
@@ -294,8 +302,16 @@ MYISAMPRESENT=$(awk '/key_buffer/' <<< "$MYSQLCONF")
 # This will take the value that's assigned to the InnoDB Buffer Pool (should it exist) and store the value
 MYISAMVALUE=$(awk -F"=" '/key_buffer/ {print $2}'i <<< "$MYSQLCONF")
 
+# Grabs just the value for the buffer pool
+[[ $MYISAMVALUE =~ (([0-9]+)).*$ ]] &&
+MYISAMNUMVALUE=${BASH_REMATCH[1]} # Only the value
+
+#Grabs just the alpha character denoting the memory denomination
+[[ $MYISAMVALUE =~ ([A-Za-z]).*$ ]] &&
+MYISAMDENOM=${BASH_REMATCH[1]} # The memory denomination being used
+
 # This calculates what the value would be in MiB since it may be written out in bytes
-MYSQLMYISAM=$(awk '{size = $1 / 1024 / 1024 ; print size " MB"} ' <<< "$MYISAMVALUE")
+MYSQLMYISAM=$(awk '{size = $1 / 1024 / 1024 ; print size " M"} ' <<< "$MYISAMVALUE")
 
 
 # Examines the my.cnf file, specifically for the Key Buffer Pool Size line. If the line is NOT present it echos the default value
@@ -304,11 +320,11 @@ MYSQLMYISAM=$(awk '{size = $1 / 1024 / 1024 ; print size " MB"} ' <<< "$MYISAMVA
 
 if [[ "$MYISAMPRESENT" == "" ]];then
 
-        echo "${MYSQLINFO}Current MyISAM:${RESET} 8 MB (default)"
+        echo "${MYSQLINFO}Current MyISAM:${RESET} 8 M (default)"
 
-elif [[ $MYISAMVALUE == *M ]];then
+elif [[ $MYISAMVALUE == *M ]] || [[ $MYISAMVALUE == *G ]];then
 
-        echo "${MYSQLINFO}Current MyISAM:${RESET} $MYISAMVALUE"
+        echo "${MYSQLINFO}Current MyISAM:${RESET} $MYISAMNUMVALUE $MYISAMDENOM"
 
 else
 

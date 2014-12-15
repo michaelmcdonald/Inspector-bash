@@ -1,3 +1,11 @@
+**1.06 -- 12/14/2014**
+
+Re-wrote most of the logic for determining the MySQL InnoDB_Buffer_Pool_size and MyISAM Key_Buffer
+values. The previous logic could not handle values that were denoted as "#G" and any such values
+would create invalid output of the script. The new logic examines the value and detects any type
+of memory denomination (the valid ones being "M" or "G") and if those are present it responds 
+accordingly. The previous logic to compute the value if entered in Bytes is still present.
+
 **1.05 -- 12/14/2014**
 
 Fixed the regex for the Apache version number so that it would show up properly on CentOS 7 boxes.
