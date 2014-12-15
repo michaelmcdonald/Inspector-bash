@@ -3,8 +3,8 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.06
-# PURPOSE: to examine various aspects of a Linux system and provide 
+# VERSION: 1.08
+# PURPOSE: to examine various aspects of a Linux system and provide
 #          quick access to that information in a clean format
 
 ##################################################################################
@@ -34,6 +34,11 @@ YELLOW=$(tput setaf 226)
 RESET=$(tput sgr0)
 
 
+# Global variables that any function can use
+
+ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{print $5}')
+
+
 ##################################################################################
 #                              BEGIN HEADER FUNCTION                             #
 ##################################################################################
@@ -51,7 +56,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.06           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.08           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
@@ -236,7 +241,7 @@ MYSQLOUTPUT=$(mysql -V)
 # Parse the output of $MYSQLOUTPUT and acquire just the version information
 MYSQLVERSION=$(awk '{gsub(/,/,""); print $5}'i <<< "$MYSQLOUTPUT")
 
-# Examines the version of MySQL as gathered from the $MYSQLVERSION variable, then captures into individual groups the 
+# Examines the version of MySQL as gathered from the $MYSQLVERSION variable, then captures into individual groups the
 # major, minor, and build values. The individual breakdown of the version number is there in case any type of logic
 # needs to be used to examine version numbers against one another. More for historical / future uses than anything.
 
@@ -352,7 +357,8 @@ function phpinfo {
 PHPVOUTPUT=$(php -v 2>/dev/null)
 
 # Capture the memory_limit line from the global php.ini
-PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' /usr/local/lib/php.ini)
+#PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' /usr/local/lib/php.ini)
+PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' $ACTUALPHPINI)
 
 
 echo
@@ -436,13 +442,13 @@ fi
 
 # Grabs just the value for the memory_limit
 [[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
-PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit 
+PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit
 
 [[ $PHPGLOBALCONF =~ ([A-Za-z]).*$ ]] &&
 PHPMEMLIMITDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
 # ************************************************************************************************************
-# **NOTE** this does NOT (yet) know if the memory limit is using M or G. Thus if a client has a memory_limit 
+# **NOTE** this does NOT (yet) know if the memory limit is using M or G. Thus if a client has a memory_limit
 # of 1 G this will display "1 MB". Logic to correctly determine that is forthcoming / needs to be written
 # ************************************************************************************************************
 
@@ -470,7 +476,7 @@ function apacheinfo {
 APACHEFULLINFO=$(httpd -V)
 
 # Grabs the netstat info for later parsing to find the number of active connections
-NETSTATINFO=$(netstat -nap)
+NETSTATINFO=$(netstat -nap 2>/dev/null)
 
 # Not including this under Apache. Will examine adding it to a "Traffic" section later on
 ## Parses the netstat info and provides us with only the number of TCP connections
@@ -697,6 +703,14 @@ clear
 # Display the header image
 header_color
 
+# Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
+APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
+
+# Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
+MYSQLTEST=$(cat /etc/my.cnf 2>/dev/null)
+
+PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
 # Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
 CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
 
@@ -710,11 +724,41 @@ cpanelinfo
 apacheinfo
 mysqlinfo
 
-else
+# If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
+elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
+systeminfo
+memoryinfo
+diskinfo
+phpinfo
+apacheinfo
+mysqlinfo
+
+# If Apache and MySQL are NOT BOTH installed, check to see if Apache and PHP are installed. If they are, run Apache / PHP safe functions
+elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]]; then
+systeminfo
+memoryinfo
+diskinfo
+phpinfo
+apacheinfo
+
+# If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
+elif [[ ! -z "$APACHETEST" ]]; then
 systeminfo
 memoryinfo
 diskinfo
 apacheinfo
+
+# If Apache and MySQL are not BOTH installed, and Apache is not installed, check for MySQL. If it is installed, run MySQL safe functions
+elif [[ ! -z "$MYSQLTEST" ]]; then
+systeminfo
+memoryinfo
+diskinfo
+mysqlinfo
+
+# If cPanel, Apache, and MySQL are NOT installed, run basic functions
+systeminfo
+memoryinfo
+diskinfo
 
 fi
 

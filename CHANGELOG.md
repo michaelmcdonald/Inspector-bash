@@ -1,3 +1,16 @@
+**1.08 -- 12/14/2014**
+
+Corrected numerous issues on Cent7 (which likely would crop up on Core-Managed boxes as well).
+Should see improved functionality in the logic if what is / is not installed as it now checks
+specifically for PHP as well. Setup a global php.ini checking component as well to ensure the
+script is using the properly loaded php.ini file on the system.
+
+**1.07 -- 12/14/2014**
+
+Created logic to examine if cPanel, Apache, or MySQL are installed. Depending on what is / is not
+installed the various functions that are safe to run will. This still does NOT factor in Ubuntu
+which will require some additional logic due to differences in files / file locations.
+
 **1.06 -- 12/14/2014**
 
 Re-wrote most of the logic for determining the MySQL InnoDB_Buffer_Pool_size and MyISAM Key_Buffer
