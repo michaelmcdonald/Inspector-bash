@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.0.11"
+SCRIPTVERSION="v1.0.12"
 
 
 ##################################################################################
@@ -738,9 +738,9 @@ LSIRAIDPRIMARY=$(awk -F"-" '/Primary/ {gsub(/,.*/,""); print $2}' <<< "$LSIINFO"
 
 
 
-# I'm sure this could be better accomplished with some regex and more of it handled within Bash itself. For now this works
-# and is extremely fast (not to mention it formats how I want). It stays. Will likely be reviewed at a later date.
-DISKUSAGE=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | awk '{print substr($0, index($0, $5))}' | column -t))
+## I'm sure this could be better accomplished with some regex and more of it handled within Bash itself. For now this works
+## and is extremely fast (not to mention it formats how I want). It stays. Will likely be reviewed at a later date.
+#DISKUSAGE=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | awk '{print substr($0, index($0, $5))}' | column -t))
 
 echo
 
@@ -750,7 +750,15 @@ echo
 
 echo "${DISKINFO}Disk Usage:${RESET}"
 
-echo "$DISKUSAGE"
+if grep -q \#zbind "/etc/fstab"; then
+
+	paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t)
+
+else
+
+	paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | awk '{print substr($0, index($0, $5))}' | column -t)
+
+fi
 
 echo
 

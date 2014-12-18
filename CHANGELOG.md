@@ -1,3 +1,10 @@
+**1.0.12 -- 12/18/2014**
+
+Corrected an issue whereby SAN mounts would flood the screen with their df data. Since I am
+not super concerned with that degree of information I have opted to cut the SAN data from the
+df output. May investigate an option where I alert the user that SAN data exists and present
+them with an opportunity to display it as well.
+
 **1.0.11 -- 12/18/2014**
 
 Corrected some issues with CentOS 4 not working correct as well as what file older versions
