@@ -9,13 +9,13 @@
 
 # Special thanks to James Dooley for peer reviewing my work and offering
 # numerous suggestions on how to improve / speed up my bash scripting
-# within this script and the predecessor of it. 
+# within this script and the predecessor of it.
 
 
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.0.10"
+SCRIPTVERSION="v1.0.11"
 
 
 ##################################################################################
@@ -60,23 +60,24 @@ ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{pri
 
 
 
-
+# Deprecated CentOS 4 check. Keeping it in case I ever get fed up with fixing 
+# issues on CentOS 4 boxes because they keep cropping up.
 ##################################################################################
 #                                   CENTOS 4 CHECK                               #
 ##################################################################################
 
-#Check for CentOS 4 since it does not play well with regex in bash
-CENTOS4CHECK=$(cat /etc/redhat-release | awk '{print $3}' | cut -d"." -f1)
-
-if [ "$CENTOS4CHECK" == "4" ]; then
-
-        echo
-
-        echo "!!! CentOS 4 is ${ISSUE}${UNDERLINE}NOT${RESET} supported !!!"
-
-        echo && exit 1
-
-fi
+##Check for CentOS 4 since it does not play well with regex in bash
+#CENTOS4CHECK=$(cat /etc/redhat-release | awk '{print $3}' | cut -d"." -f1)
+#
+#if [ "$CENTOS4CHECK" == "4" ]; then
+#
+#        echo
+#
+#        echo "!!! CentOS 4 is ${ISSUE}${UNDERLINE}NOT${RESET} supported !!!"
+#
+#        echo && exit 1
+#
+#fi
 
 
 ##################################################################################
@@ -129,7 +130,7 @@ function systeminfo {
 #CPUINFO=$(cat /proc/cpuinfo)
 
 # Identify the specific processor model
-PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2}' /proc/cpuinfo)
+PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2;exit;}' /proc/cpuinfo)
 
 # This is currently deprecated. Leaving for historical purposes
 ## Count how many cores are on the system
@@ -161,7 +162,9 @@ UBUNTUVERSION=$(cat /etc/lsb-release 2>/dev/null)
 # variables: the whole version: #.#, the major and then minor version numbers (BASH_REMATCH[1] - [3] respectively
 # and then those numbers are assigned their own variable that can be called / printed to screen. Technically
 # this is all one command / execution, for readability sake it's broken across multiple lines.
-[[ $CENTOSVERSION =~ ^.*release\ (([0-9])\.([0-9])).*$ ]] &&
+CENTOSREGEX="^.*release\ (([0-9])\.([0-9])).*$"
+#[[ $CENTOSVERSION =~ ^.*release\ (([0-9])\.([0-9])).*$ ]] &&
+[[ $CENTOSVERSION =~ $CENTOSREGEX ]] &&
 CENTOSENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: xx.xx
 CENTOSMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 CENTOSMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
@@ -174,7 +177,9 @@ CENTOSMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
 #CLOUDMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
 
 # Same as above, only for Ubuntu
-[[ $UBUNTUVERSION =~ DISTRIB_DESCRIPTION.*\ (([0-9][0-9])\.([0-9][0-9])).*$ ]] &&
+UBUNTUREGEX="DISTRIB_DESCRIPTION.*\ (([0-9][0-9])\.([0-9][0-9])).*$"
+#[[ $UBUNTUVERSION =~ DISTRIB_DESCRIPTION.*\ (([0-9][0-9])\.([0-9][0-9])).*$ ]] &&
+[[ $UBUNTUVERSION =~ $UBUNTUREGEX ]] &&
 UBUNTUENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: xx.xx
 UBUNTUMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 UBUNTUMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
@@ -292,7 +297,9 @@ MYSQLVERSION=$(awk '{gsub(/,/,""); print $5}'i <<< "$MYSQLOUTPUT")
 # major, minor, and build values. The individual breakdown of the version number is there in case any type of logic
 # needs to be used to examine version numbers against one another. More for historical / future uses than anything.
 
-[[ $MYSQLVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+MYSQLREGEX="(([0-9])\.([0-9])\.([0-9][0-9])).*$"
+#[[ $MYSQLVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
+[[ $MYSQLVERSION =~ $MYSQLREGEX ]] &&
 MYSQLENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 MYSQLMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 MYSQLMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
@@ -318,11 +325,15 @@ INNODBPRESENT=$(awk '/innodb_buffer_pool_size/' <<< "$MYSQLCONF")
 INNODBVALUE=$(awk -F"=" '/innodb_buffer_pool_size/ {print $2}'i <<< "$MYSQLCONF")
 
 # Grabs just the value for the buffer pool
-[[ $INNODBVALUE =~ (([0-9]+)).*$ ]] &&
+INNODBVALNUMREGEX="(([0-9]+)).*$"
+#[[ $INNODBVALUE =~ (([0-9]+)).*$ ]] &&
+[[ $INNODBVALUE =~ $INNODBVALNUMREGEX ]] &&
 INNODBNUMVALUE=${BASH_REMATCH[1]} # Only the value
 
 #Grabs just the alpha character denoting the memory denomination
-[[ $INNODBVALUE =~ ([A-Za-z]).*$ ]] &&
+INNODBVALALPHREGEX="([A-Za-z]).*$"
+#[[ $INNODBVALUE =~ ([A-Za-z]).*$ ]] &&
+[[ $INNODBVALUE =~ $INNODBVALALPHREGEX ]] &&
 INNODBDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
 # This calculates what the value would be in MiB since it may be written out in bytes
@@ -355,11 +366,15 @@ MYISAMPRESENT=$(awk '/key_buffer/' <<< "$MYSQLCONF")
 MYISAMVALUE=$(awk -F"=" '/key_buffer/ {print $2}'i <<< "$MYSQLCONF")
 
 # Grabs just the value for the buffer pool
-[[ $MYISAMVALUE =~ (([0-9]+)).*$ ]] &&
+MYISAMVALNUMREGEX="(([0-9]+)).*$"
+#[[ $MYISAMVALUE =~ (([0-9]+)).*$ ]] &&
+[[ $MYISAMVALUE =~ $MYISAMVALNUMREGEX ]] &&
 MYISAMNUMVALUE=${BASH_REMATCH[1]} # Only the value
 
 #Grabs just the alpha character denoting the memory denomination
-[[ $MYISAMVALUE =~ ([A-Za-z]).*$ ]] &&
+MYISAMVALALPHREGEX="([A-Za-z]).*$"
+#[[ $MYISAMVALUE =~ ([A-Za-z]).*$ ]] &&
+[[ $MYISAMVALUE =~ $MYISAMVALALPHREGEX ]] &&
 MYISAMDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
 # This calculates what the value would be in MiB since it may be written out in bytes
@@ -416,7 +431,9 @@ echo
 
 
 ## Grab the version of PHP currently installed on the system
-[[ $PHPVOUTPUT =~ (([0-9])\.([0-9]+)\.([0-9]+)).*$ ]] &&
+PHPREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
+#[[ $PHPVOUTPUT =~ (([0-9])\.([0-9]+)\.([0-9]+)).*$ ]] &&
+[[ $PHPVOUTPUT =~ $PHPREGEX ]] &&
 PHPENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 PHPMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 PHPMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
@@ -428,7 +445,7 @@ echo "${PHPINFO}Version In Use:${RESET} $PHPENTIREVERSION"
 # Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
 CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
 
-# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
+# Check against that variable. If cPanel IS installed, grab the various PHP handlers from the location cPanel sets
 if [[ ! -z "$CPANELTEST" ]]; then
 
 PHPCONF=$(cat /usr/local/apache/conf/php.conf 2>/dev/null)
@@ -457,6 +474,8 @@ echo "${PHPINFO}Handler In Use:${RESET} CGI"
 
 fi
 
+
+# If cPanel is NOT installed, grab the handlers from the default location Apache sets / uses
 else
 
 PHPCONF=$(cat /etc/httpd/conf.d/php.conf 2>/dev/null)
@@ -488,10 +507,14 @@ fi
 
 
 # Grabs just the value for the memory_limit
-[[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
+PHPCONFVALREGEX="(([0-9][0-9])).*$"
+#[[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
+[[ $PHPGLOBALCONF =~ $PHPCONFVALREGEX ]] &&
 PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit
 
-[[ $PHPGLOBALCONF =~ ([A-Za-z]).*$ ]] &&
+PHPCONFALPHREGEX="([A-Za-z]).*$"
+#[[ $PHPGLOBALCONF =~ ([A-Za-z]).*$ ]] &&
+[[ $PHPGLOBALCONF =~ $PHPCONFALPHREGEX ]] &&
 PHPMEMLIMITDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
 # ************************************************************************************************************
@@ -540,7 +563,9 @@ APACHEMPM=$(awk -F[:] '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Server MPM/ {print $2}
 # being stored as a separate variable. These individual components are not being utilized but provide the ability to
 # easily compare the major / minor version numbers for version checking.
 #[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
-[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9]+)).*$ ]] &&
+APACHEREGEX="(([0-9])\.([0-9])\.([0-9]+)).*$"
+#[[ $APACHEVERSION =~ (([0-9])\.([0-9])\.([0-9]+)).*$ ]] &&
+[[ $APACHEVERSION =~ $APACHEREGEX ]] &&
 APACHEENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 APACHEMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
 APACHEMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
@@ -567,7 +592,6 @@ echo "${APACHEINFO}MPM Being Used:${RESET} $APACHEMPM"
 
 
 
-
 ##################################################################################
 #                            BEGIN CPANEL INFO FUNCTION                          #
 ##################################################################################
@@ -581,22 +605,41 @@ CPANELVERSION=$(</usr/local/cpanel/version)
 # Inspects the cPanel release tier
 CPANELRELEASE=$(awk -F"=" ' /CPANEL/ {print $2}' /etc/cpupdate.conf)
 
-# Determines if legacy cPanel backups are enabled
-CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
-
-# Determines if the new cPanel backups are enabled
-CPANELBACKUP=$(awk -F" " ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /BACKUPENABLE/ {gsub( "['\'']","" ); print $2}' /var/cpanel/backups/config)
+## Determines if legacy cPanel backups are enabled
+#CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
+#
+## Determines if the new cPanel backups are enabled
+#CPANELBACKUP=$(awk -F" " ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /BACKUPENABLE/ {gsub( "['\'']","" ); print $2}' /var/cpanel/backups/config)
 
 # This parses the cPanel version and breaks it down into the individual components of the version number with each part
 # being stored as a separate variable. These individual components are not being utilized but provide the ability to
 # easily compare the major / minor version numbers for version checking.
-
-[[ $CPANELVERSION =~ (([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)).*$ ]] &&
+CPANELREGEX="(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)).*$"
+#[[ $CPANELVERSION =~ (([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)).*$ ]] &&
+[[ $CPANELVERSION =~ $CPANELREGEX ]] &&
 CPANELENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: xx.xx.x.xx
 CPANELMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: xx
 CPANELMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: xx
 CPANELBUILDVERSION=${BASH_REMATCH[4]} &&  # The build version #: x
 CPANELREVISIONVERSION=${BASH_REMATCH[5]}   # The revision version #: xx
+
+
+# Because older versions of cPanel set the backup status in a different file
+if [[ "$CPANELMINORVERSION" -le "32" ]]; then
+
+        CPANELLEGACY=$(awk -F" " ' /BACKUPACCTS/ {print $2}' /etc/cpbackup.conf)
+
+else
+
+# Determines if legacy cPanel backups are enabled
+        CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
+
+fi
+
+# Determines if the new cPanel backups are enabled
+CPANELBACKUP=$(awk -F" " ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /BACKUPENABLE/ {gsub( "['\'']","" ); print $2}' /var/cpanel/backups/config 2>/dev/null)
+
+
 
 
 echo
@@ -611,6 +654,16 @@ echo "${CPANELINFO}Release Set To:${RESET} $CPANELRELEASE"
 
 # Logic to review the status of the different backups systems to depending on if they're enabled or disabled
 # display an appropriate message
+
+if [ "$CPANELMINORVERSION" == "32" ] && [ "$CPANELLEGACY" == "yes" ]; then
+
+        echo "${CPANELINFO}Backups Status:${RESET} Enabled"
+
+elif [ "$CPANELMINORVERSION" == "32" ] && [ "$CPANELLEGACY" == "no" ]; then
+
+        echo "${CPANELINFO}Backups Status:${RESET} Disabled"
+
+else
 
 if [ "$CPANELLEGACY" == "no" ] && [ "$CPANELBACKUP" == "no" ]; then
 
@@ -628,6 +681,7 @@ elif [ "$CPANELLEGACY" == "yes" ] && [ "$CPANELBACKUP" == "yes" ]; then
 
         echo "${CPANELINFO}Backups Status:${RESET} BOTH Systems Enabled"
 
+fi
 fi
 
 }

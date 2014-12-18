@@ -1,3 +1,8 @@
+**1.0.11 -- 12/18/2014**
+
+Corrected some issues with CentOS 4 not working correct as well as what file older versions
+of cPanel used to reference if backups were enabled or not.
+
 **1.0.10 -- 12/18/2014**
 
 Setup an easy to use version variable to update script header while also correcting 
