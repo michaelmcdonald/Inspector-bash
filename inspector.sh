@@ -3,11 +3,26 @@
 #   TITLE: Inspector Gadget
 #  AUTHOR: michael mcdonald
 # CONTACT: michael@liquidweb.com
-# VERSION: 1.09
 # PURPOSE: to examine various aspects of a Linux system and provide
 #          quick access to that information in a clean format
 
+
+# Special thanks to James Dooley for peer reviewing my work and offering
+# numerous suggestions on how to improve / speed up my bash scripting
+# within this script and the predecessor of it. 
+
+
 ##################################################################################
+
+# Quick place to set the script's version number (adjusts the header version too)
+SCRIPTVERSION="v1.0.10"
+
+
+##################################################################################
+#                                      VARIABLES                                 #
+##################################################################################
+
+
 
 # Various color variables used throughout the script
 
@@ -40,6 +55,38 @@ ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{pri
 
 
 ##################################################################################
+#                                    END VARIABLES                               #
+##################################################################################
+
+
+
+
+##################################################################################
+#                                   CENTOS 4 CHECK                               #
+##################################################################################
+
+#Check for CentOS 4 since it does not play well with regex in bash
+CENTOS4CHECK=$(cat /etc/redhat-release | awk '{print $3}' | cut -d"." -f1)
+
+if [ "$CENTOS4CHECK" == "4" ]; then
+
+        echo
+
+        echo "!!! CentOS 4 is ${ISSUE}${UNDERLINE}NOT${RESET} supported !!!"
+
+        echo && exit 1
+
+fi
+
+
+##################################################################################
+#                                END CENTOS 4 CHECK                              #
+##################################################################################
+
+
+
+
+##################################################################################
 #                              BEGIN HEADER FUNCTION                             #
 ##################################################################################
 
@@ -56,7 +103,7 @@ echo " ${YELLOW}  ____${RESET}        ${ORANGE}|_|${RESET}${YELLOW}_            
 echo " ${YELLOW} / ___| __ _  __| | __ _  ___| |_     ${RESET}/ \              "
 echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/              "
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
-echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / v1.09           "
+echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / $SCRIPTVERSION           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 }
 
