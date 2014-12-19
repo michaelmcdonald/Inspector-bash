@@ -314,7 +314,7 @@ echo "${MYSQLINFO}Version In Use:${RESET} $MYSQLENTIREVERSION"
 echo "${MYSQLINFO}${UNDERLINE}BUFFER VALUE(s)${RESET}${MYSQLINFO}  ↓↓↓${RESET}"
 
 # Acquire the contents of the my.cnf file for parsing
-MYSQLCONF=$(cat /etc/my.cnf)
+MYSQLCONF=$(cat /etc/my.cnf 2>/dev/null)
 
 ########## INNODB BUFFER POOL SIZE LOGIC ##############
 
