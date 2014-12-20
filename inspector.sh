@@ -32,7 +32,7 @@ SYSTEMINFO=$(tput setaf 124)
 DISKINFO=$(tput setaf 100)
 TRAFFICINFO=$(tput setaf 210)
 CPANELINFO=$(tput setaf 172)
-MYSQLINFO=$(tput setaf 24)
+MYSQLINFO=$(tput setaf 74)
 APACHEINFO=$(tput setaf 5)
 PHPINFO=$(tput setaf 140)
 RECOMMENDATIONS=$(tput setaf 42)
@@ -812,6 +812,8 @@ clear
 # Display the header image
 header_color
 
+
+
 # Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
 APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
 
@@ -822,6 +824,10 @@ PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5
 
 # Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
 CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
+
+# If no command line argument given, run all functions
+if [[ -z $1 ]]; then
+
 
 # Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
 if [[ ! -z "$CPANELTEST" ]]; then
@@ -874,5 +880,98 @@ memoryinfo
 diskinfo
 
 fi
+
+fi
+
+function soft {
+
+# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
+if [[ ! -z "$CPANELTEST" ]]; then
+phpinfo
+cpanelinfo
+apacheinfo
+mysqlinfo
+
+# If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
+elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
+phpinfo
+apacheinfo
+mysqlinfo
+
+# If Apache and MySQL are NOT BOTH installed, check to see if Apache and PHP are installed. If they are, run Apache / PHP safe functions
+elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]]; then
+phpinfo
+apacheinfo
+
+# If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
+#elif [[ ! -z "$APACHETEST" ]] && [[ -z "$MYSQLTEST" ]]; then
+elif [[ ! -z "$APACHETEST" ]]; then
+apacheinfo
+
+# If Apache and MySQL are not BOTH installed, and Apache is not installed, check for MySQL. If it is installed, run MySQL safe functions
+#elif [[ ! -z "$MYSQLTEST" ]] && [[ -z "$APACHETEST" ]]; then
+elif [[ ! -z "$MYSQLTEST" ]]; then
+mysqlinfo
+
+else
+
+echo
+echo
+# If no software is present on the server that Inspector Gadget can "inspect", display an error
+echo "   ${ISSUE}!!!${RESET} ${UNDERLINE}No compatiable software to inspect${RESET} ${ISSUE}!!!${RESET}"
+fi
+}
+
+
+function HELP {
+  echo -e \\n"Help documentation for Inspector Gadget."\\n
+  echo "Command line switches are optional. The following switches are recognized."
+  echo "-a | --all     --Runs all functions. This is the default behavior."
+  echo "-s | --system  --Runs hardware related functions ONLY."
+  echo "-c | --core    --Runs software related functions ONLY. "
+  echo -e "-h | --help    --Displays this help message. No further functions are performed."\\n
+  echo -e "Example: ./inspector.sh -c"\\n
+  exit 1
+}
+
+
+# The case statement that evaluates the options passed to the script. Fairly self-explanitory, but the options each coincide with a 
+# particular function (or function group) and technically multiple options can be passed at once. If no argument is passed all
+# functions run, if an invalid argument is passed an error is displayed.
+while [ ! $# -eq 0 ]
+do
+    case "$1" in
+        --help | -h)
+            HELP
+            exit
+            ;;
+        --all | -a)
+            systeminfo
+            memoryinfo
+            diskinfo
+	    soft
+            ;;
+        --system | -s)
+            systeminfo
+            memoryinfo
+            diskinfo
+            ;;
+	--core | -c)
+	    soft
+	    ;;
+	"")
+	    systeminfo
+	    meminfo
+	    diskinfo
+	    soft
+	    ;;
+	*)
+	    echo
+	    echo "   ${ISSUE}!!!${RESET}   ${UNDERLINE}invalid option${RESET}   ${ISSUE}!!!${RESET}"
+	    echo
+	    HELP
+    esac
+    shift
+done
 
 echo

@@ -1,3 +1,10 @@
+**1.1.0 -- 12/20/2014**
+
+Have implemented all aspects of the roadmap for v1.1.0 as well as started the foundation for
+a menu system / passing options to the script. Basic functionality is there for options and
+it should work fine; however I need to test it out on various systems as well as via the remote
+call to see if it works as it should.
+
 **1.0.12 -- 12/18/2014**
 
 Corrected an issue whereby SAN mounts would flood the screen with their df data. Since I am
