@@ -1,3 +1,9 @@
+**1.1.1 -- 12/20/2014**
+
+Implemented some basic checks for Nginx and Varnish. If present on the system these checks will
+display the version of the software present. Not sure if I will add any additional functionality
+as there is not much more I can see that would be useful to include.
+
 **1.1.0 -- 12/20/2014**
 
 Have implemented all aspects of the roadmap for v1.1.0 as well as started the foundation for

@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.0.12"
+SCRIPTVERSION="v1.1.1"
 
 
 ##################################################################################
@@ -34,6 +34,8 @@ TRAFFICINFO=$(tput setaf 210)
 CPANELINFO=$(tput setaf 172)
 MYSQLINFO=$(tput setaf 74)
 APACHEINFO=$(tput setaf 5)
+NGINXINFO=$(tput setaf 34)
+VARNISHINFO=$(tput setaf 117)
 PHPINFO=$(tput setaf 140)
 RECOMMENDATIONS=$(tput setaf 42)
 SECURITYINFO=$(tput setaf 227)
@@ -802,8 +804,93 @@ fi
 }
 
 ##################################################################################
-#                              END DISK INFO FUNCTION                            #
+#                             END DISK INFO FUNCTION                             #
 ##################################################################################
+
+
+
+##################################################################################
+#                            BEGIN NGINX INFO FUNCTION                           #
+##################################################################################
+
+# Start the nginxinfo function
+function nginxinfo {
+
+# Tests to see if Nginx is present and if so records the version string
+NGINXVOUTPUT=$(nginx -v 2>/dev/null)
+
+## Grab the version of Nginx currently installed on the system
+NGINXREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
+[[ $NGINXVOUTPUT =~ $NGINXREGEX ]] &&
+NGINXENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
+NGINXMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
+NGINXMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
+NGINXBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
+
+
+# If the Nginx version can be found, continue, otherwise do nothing
+if [[ ! -z "$NGINXVOUTPUT" ]]; then
+
+	echo
+
+	echo "------------\\${NGINXINFO} ${UNDERLINE}NGINX INFO${RESET} \\----------------------------------"
+
+	echo
+
+
+	echo "${NGINXINFO}Version In Use:${RESET} ${NGINXENTIREVERSION}"
+
+
+fi
+
+}
+
+##################################################################################
+#                              END NGINX INFO FUNCTION                           #
+##################################################################################
+
+
+
+
+##################################################################################
+#                            BEGIN VARNISH INFO FUNCTION                         #
+##################################################################################
+
+# Start varnishinfo function
+function varnishinfo {
+
+# Tests to see if Varnish is present and if so records the version string
+VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>/dev/null)
+
+## Grab the version of Varnish currently installed on the system
+VARNISHREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
+[[ $VARNISHVOUTPUT =~ $VARNISHREGEX ]] &&
+VARNISHENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
+VARNISHMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
+VARNISHMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
+VARNISHBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
+
+
+# If the output of the Varnish version is present, display. Otherwise do nothing
+if [[ ! -z "$VARNISHVOUTPUT" ]]; then
+
+
+echo
+
+echo "------------\\${VARNISHINFO} ${UNDERLINE}VARNISH INFO${RESET} \\----------------------------------"
+
+echo
+
+echo "${VARNISHINFO}Version In Use:${RESET} ${VARNISHENTIREVERSION}"
+
+fi
+
+}
+
+##################################################################################
+#                              END VARNISH INFO FUNCTION                         #
+##################################################################################
+
 
 
 # Clear the screen
@@ -834,9 +921,11 @@ if [[ ! -z "$CPANELTEST" ]]; then
 systeminfo
 memoryinfo
 diskinfo
+apacheinfo
+nginxinfo
+varnishinfo
 phpinfo
 cpanelinfo
-apacheinfo
 mysqlinfo
 
 # If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
@@ -844,8 +933,10 @@ elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]
 systeminfo
 memoryinfo
 diskinfo
-phpinfo
 apacheinfo
+nginxinfo
+varnishinfo
+phpinfo
 mysqlinfo
 
 # If Apache and MySQL are NOT BOTH installed, check to see if Apache and PHP are installed. If they are, run Apache / PHP safe functions
@@ -853,8 +944,10 @@ elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]]; then
 systeminfo
 memoryinfo
 diskinfo
-phpinfo
 apacheinfo
+nginxinfo
+varnishinfo
+phpinfo
 
 # If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
 #elif [[ ! -z "$APACHETEST" ]] && [[ -z "$MYSQLTEST" ]]; then
@@ -863,6 +956,8 @@ systeminfo
 memoryinfo
 diskinfo
 apacheinfo
+nginxinfo
+varnishinfo
 
 # If Apache and MySQL are not BOTH installed, and Apache is not installed, check for MySQL. If it is installed, run MySQL safe functions
 #elif [[ ! -z "$MYSQLTEST" ]] && [[ -z "$APACHETEST" ]]; then
@@ -870,6 +965,8 @@ elif [[ ! -z "$MYSQLTEST" ]]; then
 systeminfo
 memoryinfo
 diskinfo
+nginxinfo
+varnishinfo
 mysqlinfo
 
 else
@@ -878,6 +975,8 @@ else
 systeminfo
 memoryinfo
 diskinfo
+nginxinfo
+varnishinfo
 
 fi
 
@@ -887,31 +986,41 @@ function soft {
 
 # Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
 if [[ ! -z "$CPANELTEST" ]]; then
+apacheinfo
+nginxinfo
+varnishinfo
 phpinfo
 cpanelinfo
-apacheinfo
 mysqlinfo
 
 # If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
 elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
-phpinfo
 apacheinfo
+nginxinfo
+varnishinfo
+phpinfo
 mysqlinfo
 
 # If Apache and MySQL are NOT BOTH installed, check to see if Apache and PHP are installed. If they are, run Apache / PHP safe functions
 elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]]; then
-phpinfo
 apacheinfo
+nginxinfo
+varnishinfo
+phpinfo
 
 # If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
 #elif [[ ! -z "$APACHETEST" ]] && [[ -z "$MYSQLTEST" ]]; then
 elif [[ ! -z "$APACHETEST" ]]; then
 apacheinfo
+nginxinfo
+varnishinfo
 
 # If Apache and MySQL are not BOTH installed, and Apache is not installed, check for MySQL. If it is installed, run MySQL safe functions
 #elif [[ ! -z "$MYSQLTEST" ]] && [[ -z "$APACHETEST" ]]; then
 elif [[ ! -z "$MYSQLTEST" ]]; then
 mysqlinfo
+nginxinfo
+varnishinfo
 
 else
 
