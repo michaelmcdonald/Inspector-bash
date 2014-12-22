@@ -15,11 +15,11 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.1"
+SCRIPTVERSION="v1.1.2"
 
 
 ##################################################################################
-#                                      VARIABLES                                 #
+#                                 BEGIN  VARIABLES                               #
 ##################################################################################
 
 
@@ -57,8 +57,32 @@ ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{pri
 
 
 ##################################################################################
-#                                    END VARIABLES                               #
+#                                 END VARIABLES                                  #
 ##################################################################################
+
+
+
+
+##################################################################################
+#                              BEGIN  SOFTWARE CHECKS                            #
+##################################################################################
+
+# Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
+APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
+
+# Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
+MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
+
+PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
+# Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
+CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
+
+
+##################################################################################
+#                               END SOFTWARE CHECKS                              #
+##################################################################################
+
 
 
 
@@ -108,7 +132,10 @@ echo " ${YELLOW}| |  _ / _\` |/ _\` |/ _\` |/ _ \ __|    ${RESET}\_/            
 echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
 echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / $SCRIPTVERSION           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
+
 }
+
+
 
 ##################################################################################
 #                               END HEADER FUNCTION                              #
@@ -594,6 +621,7 @@ echo "${APACHEINFO}MPM Being Used:${RESET} $APACHEMPM"
 
 
 
+
 ##################################################################################
 #                            BEGIN CPANEL INFO FUNCTION                          #
 ##################################################################################
@@ -809,6 +837,7 @@ fi
 
 
 
+
 ##################################################################################
 #                            BEGIN NGINX INFO FUNCTION                           #
 ##################################################################################
@@ -893,30 +922,20 @@ fi
 
 
 
-# Clear the screen
-clear
 
-# Display the header image
-header_color
+##################################################################################
+#                           BEGIN PRIMARY LOGIC FUNCTION                         #
+##################################################################################
 
+# Begin function primary_logic
+function primary_logic {
 
-
-# Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
-APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
-
-# Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
-MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
-
-PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
-
-# Quick check against a file that will verify if cPanel IS or is NOT installed. This is stored in a variable
-CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
 
 # If no command line argument given, run all functions
 if [[ -z $1 ]]; then
 
 
-# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
+# If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
 if [[ ! -z "$CPANELTEST" ]]; then
 systeminfo
 memoryinfo
@@ -982,6 +1001,23 @@ fi
 
 fi
 
+}
+
+##################################################################################
+#                            END PRIMARY LOGIC FUNCTION                          #
+##################################################################################
+
+
+
+
+
+
+##################################################################################
+#                         BEGIN SOFTWARE ONLY LOGIC FUNCTION                     #
+##################################################################################
+
+# Begin the function that will only display software related information. The follow examines the various functions themselves
+# and the logic decides if the function should be run based on the software being installed
 function soft {
 
 # Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
@@ -1031,57 +1067,111 @@ echo "   ${ISSUE}!!!${RESET} ${UNDERLINE}No compatiable software to inspect${RES
 fi
 }
 
+##################################################################################
+#                           END SOFTWARE ONLY LOGIC FUNCTION                     #
+##################################################################################
+
+
+
+
+##################################################################################
+#                            BEGIN HELP OPTION FUNCTION                          #
+##################################################################################
 
 function HELP {
   echo -e \\n"Help documentation for Inspector Gadget."\\n
   echo "Command line switches are optional. The following switches are recognized."
-  echo "-a | --all     --Runs all functions. This is the default behavior."
-  echo "-s | --system  --Runs hardware related functions ONLY."
-  echo "-c | --core    --Runs software related functions ONLY. "
-  echo -e "-h | --help    --Displays this help message. No further functions are performed."\\n
+  echo "-nh | --no-header --Removes the header function so it is no longer displayed."
+  echo "-a  | --all     --Runs all functions. This is the default behavior."
+  echo "-s  | --system  --Runs hardware related functions ONLY."
+  echo "-c  | --core    --Runs software related functions ONLY. "
+  echo -e "-h  | --help    --Displays this help message. No further functions are performed."\\n
   echo -e "Example: ./inspector.sh -c"\\n
   echo -e "Example: bash <(curl -skL inspector.sh) -c"\\n
   exit 1
 }
 
+##################################################################################
+#                              END HELP OPTION FUNCTION                          #
+##################################################################################
 
-# The case statement that evaluates the options passed to the script. Fairly self-explanitory, but the options each coincide with a 
+
+
+
+
+# Before doing anything, clear the screen
+clear
+
+
+
+
+##################################################################################
+#                               BEGIN CASE STATEMENTS                            #
+##################################################################################
+
+# The case statement that evaluates the options passed to the script. Fairly self-explanatory, but the options each coincide with a
 # particular function (or function group) and technically multiple options can be passed at once. If no argument is passed all
 # functions run, if an invalid argument is passed an error is displayed.
+
+# If any option to display specific content is chosen / passed, alter this to "true"
+optionran="false"
+
+# The casecading case statement. This examines each option passed and will "shift" to look for any additional options passed
+# If any specific option is passed it will alter the "optionran" variable to "true", negating the default behavior of the script
+# to display the primary_logic function
 while [ ! $# -eq 0 ]
 do
     case "$1" in
         --help | -h)
+	    header_color 2>/dev/null
             HELP
             exit
             ;;
+	--no-header | -nh)
+	    unset -f header_color
+	    ;;
         --all | -a)
-            systeminfo
-            memoryinfo
-            diskinfo
-	    soft
+	    header_color 2>/dev/null
+            primary_logic
+	    optionran="true"
             ;;
         --system | -s)
+	    header_color 2>/dev/null
             systeminfo
             memoryinfo
             diskinfo
+	    optionran="true"
+	    unset -f header_color
             ;;
-	--core | -c)
-	    soft
-	    ;;
-	"")
-	    systeminfo
-	    meminfo
-	    diskinfo
-	    soft
-	    ;;
-	*)
-	    echo
-	    echo "   ${ISSUE}!!!${RESET}   ${UNDERLINE}invalid option${RESET}   ${ISSUE}!!!${RESET}"
-	    echo
-	    HELP
+        --core | -c)
+	    header_color 2>/dev/null
+            soft
+	    optionran="true"
+	    unset -f header_color
+            ;;
+        *)
+	    header_color 2>/dev/null
+            echo
+            echo "   ${ISSUE}!!!${RESET}   ${UNDERLINE}invalid option${RESET}   ${ISSUE}!!!${RESET}"
+            echo
+            HELP
     esac
     shift
 done
+
+# If the script is executed and no options were passed run the header_color and primary_logic functions. This simulates a
+# default behavior for the script
+if [ "$optionran" == "false" ]; then
+	header_color 2>/dev/null
+	primary_logic
+fi
+
+
+##################################################################################
+#                                END CASE STATEMENTS                             #
+##################################################################################
+
+
+
 
 echo
