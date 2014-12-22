@@ -9,8 +9,8 @@ Compatibility:
 * MySQL 5.0 and higher (not tested on 4.x, yet)
 * Apache 2.2 / 2.4
 * PHP 5.x and higher (not tested on 4.x, yet)
-* CentOS 5.x, 6.x, 7.x (not tested on 4.x, yet)
-* Ubuntu systems are NOT supported at this time 
+* CentOS 4.x, 5.x, 6.x, 7.x
+* Ubuntu systems are NOT fully supporeted at this time
 * Plesk systems are NOT supported at this time
 
 Download/Installation
