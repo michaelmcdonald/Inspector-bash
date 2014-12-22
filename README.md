@@ -27,6 +27,19 @@ Alternatively you can run it by downloading it locally:
 
 Of course, you can add the execute bit (chmod +x inspector.sh) so you can execute it without calling bash directly.
 
+Additionally you can utilize some arguments at the command line to have Inspector Gadget only run certain functions. The following is the help menu that can also be triggered with the "-h" flag or "--help":
+
+> Help documentation for Inspector Gadget.
+
+> Command line switches are optional. The following switches are recognized.
+> -a | --all     --Runs all functions. This is the default behavior.
+> -s | --system  --Runs hardware related functions ONLY.
+> -c | --core    --Runs software related functions ONLY.
+> -h | --help    --Displays this help message. No further functions are performed.
+
+> Example: ./inspector.sh -c
+> Example: bash <(curl -skL inspector.sh) -s
+
 FAQ
 --
 
