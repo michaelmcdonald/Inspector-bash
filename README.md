@@ -18,7 +18,7 @@ Download/Installation
 
 The source for Inspector Gadget is open and available via Github. Feel free to clone the repo, make changes, and offer up pull requests for any features you would like to see. The simplest and shortest method of using Inspector Gadget is:
 
-    bash <(curl -sL inspector.sh)
+    bash <(curl -skL inspector.sh)
 
 Alternatively you can run it by downloading it locally:
 
@@ -32,7 +32,7 @@ FAQ
 
 Question: Will Inspector Gadget change anything on my system?
 
-**No.** Inspector Gadget is a read only script. It won't write to any configuration files, change the status of any daemons, or call your mother to wish her a happy birthday. It will give you an overview of your server's hardware and software after it completes.
+**No.** Inspector Gadget is a read only script. It will not write to any configuration files, change the status of any daemons, or call your mother to wish her a happy birthday. It will give you an overview of hardware and software on a server after it completes.
 
 Question: Can I run this script and know what’s going on?
 
