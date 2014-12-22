@@ -1040,6 +1040,7 @@ function HELP {
   echo "-c | --core    --Runs software related functions ONLY. "
   echo -e "-h | --help    --Displays this help message. No further functions are performed."\\n
   echo -e "Example: ./inspector.sh -c"\\n
+  echo -e "Example: bash <(curl -skL inspector.sh) -c"\\n
   exit 1
 }
 
