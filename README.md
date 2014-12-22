@@ -32,12 +32,17 @@ Additionally you can utilize some arguments at the command line to have Inspecto
 Help documentation for Inspector Gadget.
 
 Command line switches are optional. The following switches are recognized.
+
 -a | --all     --Runs all functions. This is the default behavior.
+
 -s | --system  --Runs hardware related functions ONLY.
+
 -c | --core    --Runs software related functions ONLY.
+
 -h | --help    --Displays this help message. No further functions are performed.
 
 Example: ./inspector.sh -c
+
 Example: bash <(curl -skL inspector.sh) -s
 
 FAQ
