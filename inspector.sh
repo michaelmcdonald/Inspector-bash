@@ -63,7 +63,7 @@ ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{pri
 
 
 # Deprecated CentOS 4 check. Keeping it in case I ever get fed up with fixing 
-# issues on CentOS 4 boxes because they keep cropping up.
+# issues on CentOS 4 boxes because they keep cropping up
 ##################################################################################
 #                                   CENTOS 4 CHECK                               #
 ##################################################################################
