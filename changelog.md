@@ -1,3 +1,9 @@
+**1.1.3 -- 12/23/2014**
+
+Corrected an issue where the Nginx function was not showing anything (as discussed in the 
+KNOWN ISSUES of v1.1.2). Altered how it was gathering the version output as well as an IF
+statement that will prevent it from showing should it not be present.
+
 **1.1.2 -- 12/22/2014**
 
 Corrected my case statement and the function logic in general. There is no a "-nh" option that 

@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.2"
+SCRIPTVERSION="v1.1.3"
 
 
 ##################################################################################
@@ -86,7 +86,7 @@ CPANELTEST=$(cat /usr/local/cpanel/version 2>/dev/null)
 
 
 
-# Deprecated CentOS 4 check. Keeping it in case I ever get fed up with fixing 
+# Deprecated CentOS 4 check. Keeping it in case I ever get fed up with fixing
 # issues on CentOS 4 boxes because they keep cropping up
 ##################################################################################
 #                                   CENTOS 4 CHECK                               #
@@ -845,8 +845,14 @@ fi
 # Start the nginxinfo function
 function nginxinfo {
 
+if [[ ! -x /usr/sbin/nginx ]]; then
+
+echo
+
+else
+
 # Tests to see if Nginx is present and if so records the version string
-NGINXVOUTPUT=$(nginx -v 2>/dev/null)
+NGINXVOUTPUT=$(nginx -v 2>&1)
 
 ## Grab the version of Nginx currently installed on the system
 NGINXREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
@@ -872,6 +878,7 @@ if [[ ! -z "$NGINXVOUTPUT" ]]; then
 
 fi
 
+fi
 }
 
 ##################################################################################
