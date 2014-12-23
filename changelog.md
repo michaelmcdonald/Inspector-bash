@@ -3,6 +3,10 @@
 Corrected my case statement and the function logic in general. There is no a "-nh" option that 
 will allow you to mute the header from being displayed on output. 
 
+KNOWN ISSUES: Nginx prints version information to STDERR. Since I redirect the stderr of commands
+to prevent unwanted errors on systems where those commands may not exist, we have an issue. 
+Currently investigating how to get around this.
+
 **1.1.1 -- 12/20/2014**
 
 Implemented some basic checks for Nginx and Varnish. If present on the system these checks will
