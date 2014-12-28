@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.4"
+SCRIPTVERSION="v1.1.5"
 
 
 ##################################################################################
@@ -1235,6 +1235,7 @@ do
 	    header_color 2>/dev/null
             primary_logic
 	    optionran="true"
+	    unset -f header_color
             ;;
         --system | -s)
 	    header_color 2>/dev/null

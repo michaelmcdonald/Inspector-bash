@@ -1,3 +1,7 @@
+** 1.1.5 -- 12/27/2014**
+
+Corrected minor issue with the header_color function and the "-a" flag.
+
 ** 1.1.4 -- 12/27/2014**
 
 Added a traffic information function that will examine the domlogs for a cPanel server 
