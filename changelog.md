@@ -1,3 +1,10 @@
+** 1.1.4 -- 12/27/2014**
+
+Added a traffic information function that will examine the domlogs for a cPanel server 
+and provide useful information in an easy to read format. Still some tweaking I want /
+should do to this function so for now it is an unannounced feature. Accessible using the
+flag "-t" or "--traffic"; however it will become public once I am satisfied with it.
+
 **1.1.3 -- 12/23/2014**
 
 Corrected an issue where the Nginx function was not showing anything (as discussed in the 
