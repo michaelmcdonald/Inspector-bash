@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.5"
+SCRIPTVERSION="v1.1.6"
 
 
 ##################################################################################
@@ -53,7 +53,7 @@ RESET=$(tput sgr0)
 
 # Global variables that any function can use
 
-ACTUALPHPINI=$(php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{print $5}')
+ACTUALPHPINI=$(/usr/local/bin/php -i | grep "Loaded Configuration File" 2>/dev/null | awk '{print $5}')
 
 
 ##################################################################################

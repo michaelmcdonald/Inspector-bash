@@ -1,3 +1,12 @@
+**1.1.6 -- 1/1/2015 **
+
+Corrected an issue with the PHP loaded configuration command (using full path to call
+php now). 
+
+KNOWN ISSUES: multiple RAID cards / RAID arrays do not display correctly. Currently
+investigating ways to properly store / display this information. If something is worth
+doingn it is worth doing right.
+
 ** 1.1.5 -- 12/27/2014**
 
 Corrected minor issue with the header_color function and the "-a" flag.
