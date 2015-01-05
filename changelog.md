@@ -1,4 +1,12 @@
-**1.1.6 -- 1/1/2015 **
+**1.1.7 -- 1/5/2015**
+
+Correct issue with PHP loaded configuration command (added 2>/dev/null)
+
+KNOWN ISSUES: multiple RAID cards / RAID arrays do not display correctly. Currently
+investigating ways to properly store / display this information. If something is worth
+doingn it is worth doing right.
+
+**1.1.6 -- 1/4/2015 **
 
 Corrected an issue with the PHP loaded configuration command (using full path to call
 php now). 
