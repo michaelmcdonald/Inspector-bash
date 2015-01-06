@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.7"
+SCRIPTVERSION="v1.1.8"
 
 
 ##################################################################################
@@ -71,7 +71,8 @@ ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration Fi
 APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
 
 # Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
-MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
+#MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
+MYSQLTEST=$(mysql -V 2>/dev/null)
 
 PHPTEST=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
 
@@ -1050,6 +1051,13 @@ apacheinfo
 nginxinfo
 varnishinfo
 phpinfo
+
+# If Apache and PHP are NOT BOTH installed, check to see if just Apache and MySQL are installed. If they are, run Apache / MySQL safe functions
+elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
+apacheinfo
+nginxinfo
+varnishinfo
+mysqlinfo
 
 # If Apache and PHP are NOT BOTH installed, check to see if JUST Apache is installed. If it is, run Apache safe functions
 #elif [[ ! -z "$APACHETEST" ]] && [[ -z "$MYSQLTEST" ]]; then

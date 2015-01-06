@@ -1,6 +1,15 @@
+**1.1.8 -- 1/6/2014**
+
+Corrected issue with logic to run Apache and MySQL functions if they are the only
+pieces of software installed.
+
+KNOWN ISSUES: multiple RAID cards / RAID arrays do not display correctly. Currently
+investigating ways to properly store / display this information. If something is worth
+doingn it is worth doing right.
+
 **1.1.7 -- 1/5/2015**
 
-Correct issue with PHP loaded configuration command (added 2>/dev/null)
+Corrected issue with PHP loaded configuration command (added 2>/dev/null)
 
 KNOWN ISSUES: multiple RAID cards / RAID arrays do not display correctly. Currently
 investigating ways to properly store / display this information. If something is worth
