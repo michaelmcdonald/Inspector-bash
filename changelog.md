@@ -1,4 +1,10 @@
-**1.1.8 -- 1/6/2014**
+**1.1.9 -- 1/9/2015**
+
+Re-wrote the logic concerning RAID controllers / arrays. Inspector Gadget can now
+handle multiple RAID cards (of brands Adaptec / LSI) as well as multiple arrays
+per controller.
+
+**1.1.8 -- 1/6/2015**
 
 Corrected issue with logic to run Apache and MySQL functions if they are the only
 pieces of software installed.

@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.8"
+SCRIPTVERSION="v1.1.9"
 
 
 ##################################################################################
@@ -725,6 +725,119 @@ fi
 
 
 ##################################################################################
+#                         BEGIN RAID ARRAY TEST FUNCTION                         #
+##################################################################################
+
+# Function for all RAID array tests
+function arraytest {
+
+# Logic to examine if the current array is on an LSI controller, if so it proceeds
+if [[ "$RAIDBRAND" == "LSI" ]];then
+
+	# Counts the number of arrays on the controller and assigns to variable
+	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -aAll | awk '/Virtual Drive:/ { count++ } END { print count }')
+
+	# Because arrays start at 0, we subtract 1 from the # of arrays and create a counter for our iterations
+	ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)
+
+	# Also want to know how what array we're looking at if there are multiple, created empty counter for this
+	CURRENTARRAY=0
+
+	# For loop that runs through the arrays, increasing the iteration counter each time, and gathers the various
+	# pieces of information relating to each array and displaying it accordingly.
+	for (( array=0; array<=$ARRAYITERATIONS; array++ )); do
+
+		# Gathers the general information about each array and stores it in a variable. We'll use this repeatedly
+		ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -a"$CURRENTARRAY")
+
+		# Determines the number of disks on a span, and the number of spans for an array. We'll use this to calculate the
+		# RAID level that array is setup for in a moment
+		LSIDISKS=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Number Of Drives/ {print $2}' <<< "$ARRAYINFO")
+		LSISPANS=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Span/ {print $2}' <<< "$ARRAYINFO")
+
+		# Calculates the total number of disks that comprise the array
+		LSINUMBERDISKS=$((LSIDISKS * LSISPANS))
+
+		# Grabs the "Primary" RAID level. Based on the number of disks / spans we can get the actual RAID level
+		LSIRAIDPRIMARY=$(awk -F"-" '/Primary/ {gsub(/,.*/,""); print $2}' <<< "$ARRAYINFO")
+
+		# Let us know what array this information applies to. This is NOT the logical array position.
+		echo "${DISKINFO}RAID Array:${RESET} #$CURRENTARRAY"
+
+		# Displays the number of disks, spans, and the actual RAID level
+		echo "${DISKINFO}# of Disks:${RESET}" $LSINUMBERDISKS
+
+		if [[ "$LSIRAIDPRIMARY" == "1" && "$LSISPANS" -gt "1" ]]; then
+
+        		echo "${DISKINFO}RAID Level:${RESET} 10"
+
+		elif [[ "$LSISPANS" == "1" ]];then
+
+        		echo "${DISKINFO}RAID Level:${RESET} 1"
+
+		else
+
+        		echo "${DISKINFO}Raid Level:${RESET} $LSIRAIDPRIMARY"
+
+		fi
+
+		echo
+
+		# Increases the counter for what array we just examined
+		((CURRENTARRAY+=1))
+	done
+
+# Logic to examine if the current array is on an Adaptec controller, if so it proceeds
+elif [[ "$RAIDBRAND" == "Adaptec" ]];then
+
+	# Counts the number of arrays on the controller and assigns to variable
+	NUMARRAYS=$(/usr/StorMan/arcconf getconfig $controller ld | awk '/Logical device number/ { count++ } END { print count }')
+
+	# Because arrays start at 0, we subtract 1 from the # of arrays and create a counter for our iterations
+        ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)
+
+        # Also want to know how what array we're looking at if there are multiple, created empty counter for this
+        CURRENTARRAY=0
+
+        # For loop that runs through the arrays, increasing the iteration counter each time, and gathers the various
+        # pieces of information relating to each array and displaying it accordingly.
+        for (( array=0; array<=$ARRAYITERATIONS; array++ )); do
+
+                # Gathers the general information about each array and stores it in a variable. We'll use this repeatedly
+                #ARRAYINFO=$(/usr/StorMan/arcconf getconfig "$adapteccontroller" ld "$CURRENTARRAY")
+                ARRAYINFO=$(/usr/StorMan/arcconf getconfig "$controller" ld "$CURRENTARRAY")
+
+		# Counter the number of disks involved and the RAID level of the array
+		#ADAPTECDISKS=$(awk '/Device #/ {++c} END {print c}' <<< "$ARRAYINFO")
+		ADAPTECDISKS=$(awk '/Segment [0-9]/ {++c} END {print c}' <<< "$ARRAYINFO")
+		ADAPTECRAID=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /RAID level/ {print $2}' <<< "$ARRAYINFO")
+
+		# Let us know what array this information applies to. This is NOT the logical array position.
+		echo "${DISKINFO}RAID Array:${RESET} #$CURRENTARRAY"
+
+		# Displays the number of disks involved in the array and the RAID level
+		echo "${DISKINFO}# of Disks:${RESET}" $ADAPTECDISKS
+
+        	echo "${DISKINFO}RAID Level:${RESET}" $ADAPTECRAID
+
+		echo
+
+		# Increases the counter for what array we just examined
+		((CURRENTARRAY+=1))
+
+	done
+
+fi
+}
+
+##################################################################################
+#                           END RAID ARRAY TEST FUNCTION                         #
+##################################################################################
+
+
+
+
+##################################################################################
 #                            BEGIN DISK INFO FUNCTION                            #
 ##################################################################################
 
@@ -734,39 +847,15 @@ function diskinfo {
 # Identify the BRAND of the RAID controller currently being used
 RAIDBRAND=$(lspci 2>/dev/null | awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}')
 
-# The base information for the Adaptec cards
-ADAPTECINFO=$(/usr/StorMan/arcconf getconfig 1 2>/dev/null)
+# Controller counters. Identifies the physical controller being queries, and sets the counters for the
+# brand specific versioning of what controller is being queried
+controller=1
+adapteccontroller=1
+lsicontroller=0
 
-# Identify the specific model of Adaptec card being used
-ADAPTECMODEL=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Controller Model/ {print $2}' <<< "$ADAPTECINFO")
-
-# Identify the current RAID level being implemented
-ADAPTECRAID=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /RAID level/ {print $2}' <<< "$ADAPTECINFO")
-
-# Count the number of devices / hard disks being used
-ADAPTECDISKS=$(awk '/Device #/ {++c} END {print c}' <<< "$ADAPTECINFO")
-
-# The base information for the LSI RAID
-LSIINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aAll 2>/dev/null)
-
-# The adapter information for the LSI / MegaRAID cards
-LSIADAPTERINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -aAll 2>/dev/null)
-
-# The specific LSI / MegaSAS RAID controller model
-LSIMODEL=$(awk -F ":" '/Product Name/ {print $2}' <<< "$LSIADAPTERINFO")
-
-
-# Identifies how many drives / spans are involved with the RAID setup. This assists with calculating total # of disks
-LSIDISKS=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Number Of Drives/ {print $2}' <<< "$LSIINFO")
-LSISPANS=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Span/ {print $2}' <<< "$LSIINFO")
-
-# Calculates the number of physical drives involved in the RAID setup
-LSINUMBERDISKS=$((LSIDISKS * LSISPANS))
-
-# This will show just "#" as the primary RAID level. Combined with how many spans are involved we can determine the
-# actual RAID level (at least RAID 1 vs RAID 10)
-LSIRAIDPRIMARY=$(awk -F"-" '/Primary/ {gsub(/,.*/,""); print $2}' <<< "$LSIINFO")
-
+ADAPTERS=$RAIDBRAND
+CARDARRAY=( ${ADAPTERS} )
+NUMCARDS=$(echo ${#CARDARRAY[@]})
 
 
 ## I'm sure this could be better accomplished with some regex and more of it handled within Bash itself. For now this works
@@ -781,8 +870,11 @@ echo
 
 echo "${DISKINFO}Disk Usage:${RESET}"
 
+# I'm not concerned with showing all the SAN mounts. This examines the fstab file and uses the SAN mount entries there as a list
+# for what to remove from the actual disk usage display
 if grep -q \#zbind "/etc/fstab"; then
 
+# Some gnarly uses of the paste and column commands that allow me to interject the inode usage % inline with the disk usage display
 	paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t)
 
 else
@@ -799,35 +891,70 @@ if [[ "$RAIDBRAND" == "" ]];then
 
 	echo "${DISKINFO}Controller:${RESET} N/A"
 
-# If Adaptec is present, run the Adaptec commands and present the relevant information
-elif [[ "$RAIDBRAND" == "Adaptec" ]];then
+# Examines how many RAID controller cards are installed on the system. If equal to one, only examines
+# the number of arrays involved with that controller. If more than one card exists it examines their
+# brand to see how many iterations of the arraytest function it needs to perform for each controller
+elif [[ "$NUMCARDS" == "1" ]];then
+RAIDBRAND=${CARDARRAY[$I]}
+  if [[ "$RAIDBRAND" == "Adaptec" ]]; then
 
-	echo "${DISKINFO}Controller:${RESET}" $ADAPTECMODEL
+     ADAPTECMODEL=$(/usr/StorMan/arcconf getconfig "$adapteccontroller" | awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Controller Model/ {print $2}')
 
-        echo "${DISKINFO}# of Disks:${RESET}" $ADAPTECDISKS
+     echo "${DISKINFO}Model Used:${RESET} $ADAPTECMODEL"
 
-        echo "${DISKINFO}RAID Level:${RESET}" $ADAPTECRAID
+     echo
 
-# If LSI is present, run the MegaCLI commands and present the relevant information
-elif [[ "$RAIDBRAND" == "LSI" ]];then
+  elif [[ "$RAIDBRAND" == "LSI" ]]; then
 
-        echo "${DISKINFO}Controller:${RESET}" $LSIMODEL
+     LSIMODEL=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -a"$lsicontroller" | awk -F ":" '/Product Name/ {print $2}' | sed -e 's/^[ \t]*//')
 
-        echo "${DISKINFO}# of Disks:${RESET}" $LSINUMBERDISKS
+     echo "${DISKINFO}Model Used:${RESET} $LSIMODEL"
 
-if [[ "$LSIRAIDPRIMARY" == "1" && "$LSISPANS" -gt "1" ]]; then
+     echo
 
-        echo "${DISKINFO}RAID Level:${RESET} 10"
+  fi
+  arraytest
+  echo
 
-elif [[ "$LSISPANS" == "1" ]];then
+elif [[ "$NUMCARDS" -gt "1" ]]; then
 
-        echo "${DISKINFO}RAID Level:${RESET} 1"
 
-else
+# For loop that identifies if the first controller is an Adaptec or LSI controller, then proceeds with the
+# logic to grab the model before calling the arraytest function to examine for multiple RAID arrays
+# on the particular controller. Finally it increments the various counter variables to examine if there are
+# any additional controllers to be examined
+for I in ${!CARDARRAY[*]}; do
+  RAIDBRAND=${CARDARRAY[$I]}
+  echo "${DISKINFO}Controller:${RESET} #$controller"
 
-        echo "${DISKINFO}Raid Level:${RESET} $LSIRAIDPRIMARY"
+  if [[ "$RAIDBRAND" == "Adaptec" ]]; then
 
-fi
+     ADAPTECMODEL=$(/usr/StorMan/arcconf getconfig "$adapteccontroller" | awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Controller Model/ {print $2}')
+
+     echo "${DISKINFO}Model Used:${RESET} $ADAPTECMODEL"
+
+     ((adapteccontroller+=1))
+
+     echo
+
+  elif [[ "$RAIDBRAND" == "LSI" ]]; then
+
+     LSIMODEL=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -a"$lsicontroller" | awk -F ":" '/Product Name/ {print $2}' | sed -e 's/^[ \t]*//')
+
+     echo "${DISKINFO}Model Used:${RESET} $LSIMODEL"
+
+     ((lsicontroller+=1))
+
+     echo
+
+  fi
+
+  arraytest
+
+  ((controller+=1))
+
+done
+
 fi
 
 }
