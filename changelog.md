@@ -1,3 +1,9 @@
+**1.1.10 -- 1/9/2015**
+
+Cleaned up the disk usage components so that the "on" in "Mounted on" no longer 
+is displayed. There were instances where there would be a large game between the
+two words and it looked bad. 
+
 **1.1.9 -- 1/9/2015**
 
 Re-wrote the logic concerning RAID controllers / arrays. Inspector Gadget can now
