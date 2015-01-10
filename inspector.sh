@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.10"
+SCRIPTVERSION="v1.1.12"
 
 
 ##################################################################################
@@ -452,8 +452,6 @@ PHPVOUTPUT=$(php -v 2>/dev/null)
 #PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' /usr/local/lib/php.ini)
 PHPGLOBALCONF=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /memory_limit/ {print $2}' $ACTUALPHPINI)
 
-
-echo
 
 echo "------------\\${PHPINFO} ${UNDERLINE}PHP INFO${RESET} \\----------------------------------"
 

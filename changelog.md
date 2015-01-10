@@ -1,3 +1,7 @@
+**1.1.12 -- 1/9/2015**
+
+Corrected spacing issue with the PHP info section
+
 **1.1.11 -- 1/9/2015**
 
 Corrected issues with LSI cards not showing appropriate array information.
