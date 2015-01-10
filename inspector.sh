@@ -735,7 +735,8 @@ function arraytest {
 if [[ "$RAIDBRAND" == "LSI" ]];then
 
 	# Counts the number of arrays on the controller and assigns to variable
-	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -aAll | awk '/Virtual Drive:/ { count++ } END { print count }')
+	#NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -aAll | awk '/Virtual Drive/ { count++ } END { print count }')
+	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Virtual Drive/ { count++ } END { print count }')
 
 	# Because arrays start at 0, we subtract 1 from the # of arrays and create a counter for our iterations
 	ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)
@@ -748,7 +749,8 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 	for (( array=0; array<=$ARRAYITERATIONS; array++ )); do
 
 		# Gathers the general information about each array and stores it in a variable. We'll use this repeatedly
-		ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -a"$CURRENTARRAY")
+		#ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -a"$CURRENTARRAY")
+		ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$CURRENTARRAY" -a"$lsicontroller")
 
 		# Determines the number of disks on a span, and the number of spans for an array. We'll use this to calculate the
 		# RAID level that array is setup for in a moment
@@ -925,12 +927,13 @@ elif [[ "$NUMCARDS" -gt "1" ]]; then
 # any additional controllers to be examined
 for I in ${!CARDARRAY[*]}; do
   RAIDBRAND=${CARDARRAY[$I]}
-  echo "${DISKINFO}Controller:${RESET} #$controller"
+  #echo "${DISKINFO}Controller:${RESET} #$controller"
 
   if [[ "$RAIDBRAND" == "Adaptec" ]]; then
 
      ADAPTECMODEL=$(/usr/StorMan/arcconf getconfig "$adapteccontroller" | awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Controller Model/ {print $2}')
 
+     echo "${DISKINFO}Controller:${RESET} #$controller"
      echo "${DISKINFO}Model Used:${RESET} $ADAPTECMODEL"
 
      ((adapteccontroller+=1))
@@ -941,9 +944,10 @@ for I in ${!CARDARRAY[*]}; do
 
      LSIMODEL=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -a"$lsicontroller" | awk -F ":" '/Product Name/ {print $2}' | sed -e 's/^[ \t]*//')
 
+     echo "${DISKINFO}Controller:${RESET} #$lsicontroller"
      echo "${DISKINFO}Model Used:${RESET} $LSIMODEL"
 
-     ((lsicontroller+=1))
+     #((lsicontroller+=1))
 
      echo
 
@@ -952,6 +956,7 @@ for I in ${!CARDARRAY[*]}; do
   arraytest
 
   ((controller+=1))
+  ((lsicontroller+=1))
 
 done
 

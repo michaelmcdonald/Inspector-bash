@@ -1,3 +1,7 @@
+**1.1.11 -- 1/9/2015**
+
+Corrected issues with LSI cards not showing appropriate array information.
+
 **1.1.10 -- 1/9/2015**
 
 Cleaned up the disk usage components so that the "on" in "Mounted on" no longer 
