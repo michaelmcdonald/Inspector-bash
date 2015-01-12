@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.12"
+SCRIPTVERSION="v1.1.13"
 
 
 ##################################################################################
@@ -771,7 +771,7 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 
         		echo "${DISKINFO}RAID Level:${RESET} 10"
 
-		elif [[ "$LSISPANS" == "1" ]];then
+		elif [[ "$LSIRAIDPRIMARY" == "1" && "$LSISPANS" == "1" ]];then
 
         		echo "${DISKINFO}RAID Level:${RESET} 1"
 

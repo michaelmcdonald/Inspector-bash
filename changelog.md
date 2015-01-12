@@ -1,3 +1,9 @@
+**1.1.13 - 1/12/2015**
+
+Corrected an issue with the LSI RAID logic to correctly display the RAID level for
+RAID 5 (and theoretically any other RAID level) since it was only ever going to 
+display RAID 1 or RAID 10.
+
 **1.1.12 -- 1/9/2015**
 
 Corrected spacing issue with the PHP info section
