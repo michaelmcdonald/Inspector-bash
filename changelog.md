@@ -1,3 +1,8 @@
+**1.1.15 -- 1/12/2015**
+
+Corrected adaptec array count logic since some controllers start at 0 while others
+start at 1. This will now find the appropriate starting value and use that.
+
 **1.1.14 -- 1/12/2015**
 
 Corrected what string I look for in regards to how many LSI arrays there are to

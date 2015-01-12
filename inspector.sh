@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.14"
+SCRIPTVERSION="v1.1.15"
 
 
 ##################################################################################
@@ -798,7 +798,11 @@ elif [[ "$RAIDBRAND" == "Adaptec" ]];then
         ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)
 
         # Also want to know how what array we're looking at if there are multiple, created empty counter for this
-        CURRENTARRAY=0
+        #CURRENTARRAY=0
+        firstarray=$(/usr/StorMan/arcconf getconfig $controller ld | awk '/Logical device number/ {print; count++; if (count=1) exit}')
+	firstarrayregex="([0-9])\.*$"
+	[[ $firstarray =~ $firstarrayregex ]] &&
+	CURRENTARRAY=${BASH_REMATCH[1]} 
 
         # For loop that runs through the arrays, increasing the iteration counter each time, and gathers the various
         # pieces of information relating to each array and displaying it accordingly.
