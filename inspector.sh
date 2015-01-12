@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.13"
+SCRIPTVERSION="v1.1.14"
 
 
 ##################################################################################
@@ -734,7 +734,8 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 
 	# Counts the number of arrays on the controller and assigns to variable
 	#NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -aAll | awk '/Virtual Drive/ { count++ } END { print count }')
-	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Virtual Drive/ { count++ } END { print count }')
+	#NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Virtual Drive/ { count++ } END { print count }')
+	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Target Id/ { count++ } END { print count }')
 
 	# Because arrays start at 0, we subtract 1 from the # of arrays and create a counter for our iterations
 	ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)

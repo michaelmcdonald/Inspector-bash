@@ -1,4 +1,9 @@
-**1.1.13 - 1/12/2015**
+**1.1.14 -- 1/12/2015**
+
+Corrected what string I look for in regards to how many LSI arrays there are to
+work more accurately with newer and older LSI cards.
+
+**1.1.13 -- 1/12/2015**
 
 Corrected an issue with the LSI RAID logic to correctly display the RAID level for
 RAID 5 (and theoretically any other RAID level) since it was only ever going to 
