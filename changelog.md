@@ -1,3 +1,9 @@
+**1.1.16 -- 1/12/2015**
+
+Added components to System Info function to identify the timezone the server is 
+set for as well as some simple logic to inform you of the number of users logged
+into a machine.
+
 **1.1.15 -- 1/12/2015**
 
 Corrected adaptec array count logic since some controllers start at 0 while others

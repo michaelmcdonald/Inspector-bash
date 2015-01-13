@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.15"
+SCRIPTVERSION="v1.1.16"
 
 
 ##################################################################################
@@ -218,20 +218,47 @@ UBUNTUMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
 # Checking to see if the variable $CENTOSVERSION is empty or not. If it IS empty we proceed to believe we're on Ubuntu
 if [[ -z $CENTOSVERSION ]]; then
 
+	FULLTIMEZONE=$(</etc/timezone)
+
         echo "${SYSTEMINFO}Operating System:${RESET} Ubuntu $UBUNTUENTIREVERSION"
+	
+	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
 
 # If it's NOT empty, we examine the contents of the varible for the string "CloudLinux". If present, we presume we're on CL, if not, continue
 elif [[ $CENTOSVERSION == *CloudLinux* ]]; then
 
+	FULLTIMEZONE=$(cat /etc/sysconfig/clock | awk -F"\"" '{print $2}')
+
         echo "${SYSTEMINFO}Operating System:${RESET} CloudLinux $CENTOSENTIREVERSION"
 
+	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
+	
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else
 
+	FULLTIMEZONE=$(cat /etc/sysconfig/clock | awk -F"\"" '{print $2}')
+
         echo "${SYSTEMINFO}Operating System:${RESET} CentOS $CENTOSENTIREVERSION"
+
+	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
 
 fi
 
+NUMBERUSERS=$(users | wc -w)
+DISPLAYUSERS=$(echo "$NUMBERUSERS-1" | bc)
+
+if [[ "$NUMBERUSERS" == "1" ]]; then
+
+	echo "${SYSTEMINFO}Current Users On:${RESET} 1 (just you)"
+
+elif [[ "$NUMBERUSERS" == "2" ]]; then
+
+	echo "${SYSTEMINFO}Current Users On:${RESET} 2 (you and 1 other)"
+	
+elif [[ "$NUMBERUSERS" -gt "2" ]]; then
+
+	echo "${SYSTEMINFO}Current Users On:${RESET} $NUMBERUSERS (you and $DISPLAYUSERS others)"
+fi
 }
 
 
