@@ -1,3 +1,7 @@
+**1.1.17 -- 1/13/2015**
+
+Added some logic to test for the PHP binary and left in some profiling functions.
+
 **1.1.16 -- 1/12/2015**
 
 Added components to System Info function to identify the timezone the server is 

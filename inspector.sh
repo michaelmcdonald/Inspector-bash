@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.16"
+SCRIPTVERSION="v1.1.17"
 
 
 ##################################################################################
@@ -53,7 +53,21 @@ RESET=$(tput sgr0)
 
 # Global variables that any function can use
 
-ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
+# Logic to test the PHP binary so that we can get the information we need on a cPanel or none server
+#ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
+PHPBINARYTEST=$(/usr/local/bin/php -i 2>/dev/null)
+
+if [[ "$PHPBINARYTEST" == "" ]]; then
+
+        ACTUALPHPINI=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
+else
+
+        ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
+
+fi
 
 
 ##################################################################################
@@ -64,13 +78,21 @@ ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration Fi
 
 
 ##################################################################################
-#                             BEGIN PRINTLOG FUNCTION                            #
+#                             BEGIN PRINTLOG FUNCTIONS                           #
 ##################################################################################
 
 function printLog {
-    if [[ $logfile ]]; then
-        echo "[$(date)] $@" >> $logfile
+    if [[ printLog.log ]]; then
+        echo "[$(date +%s.%N)] $@" >> printLog.log
     fi    
+}
+
+function getTime {
+        date +%s.%N
+}
+
+function getDelta {
+        awk -vs="$1" -ve="$2" 'BEGIN{printf "%.3f", (e - s)}'
 }
 
 ##################################################################################
@@ -1207,17 +1229,17 @@ fi
 # and the logic decides if the function should be run based on the software being installed
 function soft {
 
-# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
-if [[ ! -z "$CPANELTEST" ]]; then
-apacheinfo
-nginxinfo
-varnishinfo
-phpinfo
-cpanelinfo
-mysqlinfo
+	# Check against that variable. If cPanel IS installed, run all the functions. If it's NOT installed, only run non-cPanel safe functions
+	if [[ ! -z "$CPANELTEST" ]]; then
+		apacheinfo
+		nginxinfo
+		varnishinfo
+		phpinfo
+		cpanelinfo
+		mysqlinfo
 
-# If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
-elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
+	# If cPanel is NOT installed, check to see if  Apache, PHP, and MySQL ARE installed. If so, run Apache / PHP / MySQL safe functions
+	elif [[ ! -z "$APACHETEST" ]] && [[ ! -z "$PHPTEST" ]] && [[ ! -z "$MYSQLTEST" ]]; then
 apacheinfo
 nginxinfo
 varnishinfo
@@ -1280,38 +1302,38 @@ NOW=$(date +"%d/%b/%Y")
 
 # Using the current date, store all the entries from all domlogs into a variable that we can reference
 # repeatedly without having to call upon that data over and over again
-printLog DOMLOGINFO=$(grep "$NOW:" /home/domlogs/*)
+DOMLOGINFO=$(grep "$NOW:" /home/domlogs/*)
 
 # Variable storing the output of the netstat command so that I could use the same information across
 # multiple aspects of this script without having to call netstat each time
-printLog NETSTATINFO=$(netstat -nap)
+NETSTATINFO=$(netstat -nap)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: domain) gets it's own line. Any duplicate entries
 # (meaning domains receiving multiple POST requests) will be tallied up and a number displayed next to them
-printLog DOMAINREQS=$(awk -F":" '/POST/ {h[$1]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | sort -n)
+DOMAINREQS=$(awk -F":" '/POST/ {h[$1]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | sort -n)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: IP address) gets it's own line. Any duplicate entries
 # (meaning IPs sending multiple POST requests) will be tallied up and a number displayed next to them
-printLog IPREQS=$(awk -F '[: ]' '/POST/ {h[$2]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t)
+IPREQS=$(awk -F '[: ]' '/POST/ {h[$2]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: file) gets it's own line. Any duplicate entries
 # (meaning files receiving multiple POST requests) will be tallied up and a number displayed next to them
-printLog FILEREQS=$(awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t | head -n5)
+FILEREQS=$(awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t | head -n5)
 
 # Couple of awk statements that parse through the netstat info and gathers the current IP addresses with
 # connections and how many connections each has
-printLog TOPIPCONNS=$(awk '/:80/ {print $5}' <<< "$NETSTATINFO" | awk -F":" '{h[$1]++}; END { for(k in h) print k, h[k] }')
+TOPIPCONNS=$(awk '/:80/ {print $5}' <<< "$NETSTATINFO" | awk -F":" '{h[$1]++}; END { for(k in h) print k, h[k] }')
 
 # Uses the netstatinfo variable to identify the total number of connections currently on port 80
-printLog ACTIVECONNS=$(grep :80 <<< "$NETSTATINFO" | wc -l)
+ACTIVECONNS=$(grep :80 <<< "$NETSTATINFO" | wc -l)
 
 # Uses the output of the $DOMAINREQS variable to identify the website that had the most posts requests
-printLog HITTER=$(awk 'NR==1{print $1}' <<< "$DOMAINREQS" | cut -d "/" -f4)
+HITTER=$(awk 'NR==1{print $1}' <<< "$DOMAINREQS" | cut -d "/" -f4)
 
-printLog DOMAINFILES=$(grep "$NOW:" /home/domlogs/$HITTER | awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' | column -t | head -n5)
+DOMAINFILES=$(grep "$NOW:" /home/domlogs/$HITTER | awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' | column -t | head -n5)
 
 
 echo
