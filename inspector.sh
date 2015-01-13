@@ -1280,38 +1280,38 @@ NOW=$(date +"%d/%b/%Y")
 
 # Using the current date, store all the entries from all domlogs into a variable that we can reference
 # repeatedly without having to call upon that data over and over again
-printlog DOMLOGINFO=$(grep "$NOW:" /home/domlogs/*)
+printLog DOMLOGINFO=$(grep "$NOW:" /home/domlogs/*)
 
 # Variable storing the output of the netstat command so that I could use the same information across
 # multiple aspects of this script without having to call netstat each time
-printlog NETSTATINFO=$(netstat -nap)
+printLog NETSTATINFO=$(netstat -nap)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: domain) gets it's own line. Any duplicate entries
 # (meaning domains receiving multiple POST requests) will be tallied up and a number displayed next to them
-printlog DOMAINREQS=$(awk -F":" '/POST/ {h[$1]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | sort -n)
+printLog DOMAINREQS=$(awk -F":" '/POST/ {h[$1]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | sort -n)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: IP address) gets it's own line. Any duplicate entries
 # (meaning IPs sending multiple POST requests) will be tallied up and a number displayed next to them
-printlog IPREQS=$(awk -F '[: ]' '/POST/ {h[$2]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t)
+printLog IPREQS=$(awk -F '[: ]' '/POST/ {h[$2]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t)
 
 # Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
 # and then pipes that into an array. Each unique entry (see: file) gets it's own line. Any duplicate entries
 # (meaning files receiving multiple POST requests) will be tallied up and a number displayed next to them
-printlog FILEREQS=$(awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t | head -n5)
+printLog FILEREQS=$(awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t | head -n5)
 
 # Couple of awk statements that parse through the netstat info and gathers the current IP addresses with
 # connections and how many connections each has
-printlog TOPIPCONNS=$(awk '/:80/ {print $5}' <<< "$NETSTATINFO" | awk -F":" '{h[$1]++}; END { for(k in h) print k, h[k] }')
+printLog TOPIPCONNS=$(awk '/:80/ {print $5}' <<< "$NETSTATINFO" | awk -F":" '{h[$1]++}; END { for(k in h) print k, h[k] }')
 
 # Uses the netstatinfo variable to identify the total number of connections currently on port 80
-printlog ACTIVECONNS=$(grep :80 <<< "$NETSTATINFO" | wc -l)
+printLog ACTIVECONNS=$(grep :80 <<< "$NETSTATINFO" | wc -l)
 
 # Uses the output of the $DOMAINREQS variable to identify the website that had the most posts requests
-printlog HITTER=$(awk 'NR==1{print $1}' <<< "$DOMAINREQS" | cut -d "/" -f4)
+printLog HITTER=$(awk 'NR==1{print $1}' <<< "$DOMAINREQS" | cut -d "/" -f4)
 
-printlog DOMAINFILES=$(grep "$NOW:" /home/domlogs/$HITTER | awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' | column -t | head -n5)
+printLog DOMAINFILES=$(grep "$NOW:" /home/domlogs/$HITTER | awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' | column -t | head -n5)
 
 
 echo
