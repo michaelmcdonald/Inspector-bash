@@ -666,7 +666,6 @@ APACHEMINORVERSION=${BASH_REMATCH[3]} &&  # The minor version #: x
 APACHEBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 
 
-echo
 
 echo "------------\\${APACHEINFO} ${UNDERLINE}APACHE INFO${RESET} \\-------------------------------"
 
@@ -891,7 +890,7 @@ elif [[ "$RAIDBRAND" == "Adaptec" ]];then
 
         	echo "${DISKINFO}RAID Level:${RESET}" $ADAPTECRAID
 
-		#echo
+		echo
 
 		# Increases the counter for what array we just examined
 		((CURRENTARRAY+=1))
