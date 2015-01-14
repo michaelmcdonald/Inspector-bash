@@ -1,3 +1,8 @@
+**1.1.19 -- 1/14/2015**
+
+Corrected an additional spacing issue with DISK INFO section after a controller
+type of "N/A".
+
 **1.1.18 -- 1/14/2015**
 
 Corrected spacing issues in the RAID array section between DISK INFO and APACHE

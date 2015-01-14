@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.18"
+SCRIPTVERSION="v1.1.19"
 
 
 ##################################################################################
@@ -961,6 +961,8 @@ echo
 if [[ "$RAIDBRAND" == "" ]];then
 
 	echo "${DISKINFO}Controller:${RESET} N/A"
+
+	echo
 
 # Examines how many RAID controller cards are installed on the system. If equal to one, only examines
 # the number of arrays involved with that controller. If more than one card exists it examines their
