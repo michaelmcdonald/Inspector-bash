@@ -891,7 +891,7 @@ elif [[ "$RAIDBRAND" == "Adaptec" ]];then
 
         	echo "${DISKINFO}RAID Level:${RESET}" $ADAPTECRAID
 
-		echo
+		#echo
 
 		# Increases the counter for what array we just examined
 		((CURRENTARRAY+=1))
