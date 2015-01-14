@@ -1,3 +1,8 @@
+**1.1.18 -- 1/14/2015**
+
+Corrected spacing issues in the RAID array section between DISK INFO and APACHE
+sections as well as fixing spacing issues in the CPU processor output.
+
 **1.1.17 -- 1/13/2015**
 
 Added some logic to test for the PHP binary and left in some profiling functions.

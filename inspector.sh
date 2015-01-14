@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.17"
+SCRIPTVERSION="v1.1.18"
 
 
 ##################################################################################
@@ -199,7 +199,8 @@ function systeminfo {
 #CPUINFO=$(cat /proc/cpuinfo)
 
 # Identify the specific processor model
-PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2;exit;}' /proc/cpuinfo)
+#PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2;exit;}' /proc/cpuinfo)
+PROCESSORTYPE=$(awk -F":" ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /model name/ {print $2;exit;}' /proc/cpuinfo | sed 's/ \+/ /g')
 
 # This is currently deprecated. Leaving for historical purposes
 ## Count how many cores are on the system
