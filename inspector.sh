@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.19"
+SCRIPTVERSION="v1.1.20"
 
 
 ##################################################################################
@@ -727,7 +727,7 @@ if [[ "$CPANELMINORVERSION" -le "32" ]]; then
 else
 
 # Determines if legacy cPanel backups are enabled
-        CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
+        CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf 2>/dev/null)
 
 fi
 

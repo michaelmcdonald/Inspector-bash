@@ -1,3 +1,8 @@
+**1.1.20 -- 1/18/2015**
+
+Corrected an issue whereby the CPANEL INFO section would display an error if no
+cPanel accounts were present.
+
 **1.1.19 -- 1/14/2015**
 
 Corrected an additional spacing issue with DISK INFO section after a controller
