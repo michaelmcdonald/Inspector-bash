@@ -917,7 +917,7 @@ function diskinfo {
 
 # Identify the BRAND of the RAID controller currently being used
 #RAIDBRAND=$(lspci 2>/dev/null | awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}')
-CONTROLLERCOUNT=$(lspci 2>/dev/null | awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}')
+CONTROLLERCOUNT=$(lspci 2>/dev/null | grep -i RAID)
 RAIDBRAND=$(awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}' <<< "$CONTROLLERCOUNT")
 
 # Controller counters. Identifies the physical controller being queries, and sets the counters for the
