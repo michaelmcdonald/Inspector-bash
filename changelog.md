@@ -1,3 +1,7 @@
+**1.1.21 -- 1/19/2015**
+
+Corrected STDERR output for MegaCli commands
+
 **1.1.20 -- 1/18/2015**
 
 Corrected an issue whereby the CPANEL INFO section would display an error if no

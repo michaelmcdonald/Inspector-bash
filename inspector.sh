@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.20"
+SCRIPTVERSION="v1.1.21"
 
 
 ##################################################################################
@@ -801,7 +801,7 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 	# Counts the number of arrays on the controller and assigns to variable
 	#NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -aAll | awk '/Virtual Drive/ { count++ } END { print count }')
 	#NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Virtual Drive/ { count++ } END { print count }')
-	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" | awk '/Target Id/ { count++ } END { print count }')
+	NUMARRAYS=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -a"$lsicontroller" 2>/dev/null | awk '/Target Id/ { count++ } END { print count }')
 
 	# Because arrays start at 0, we subtract 1 from the # of arrays and create a counter for our iterations
 	ARRAYITERATIONS=$(echo "$NUMARRAYS-1" | bc)
@@ -815,7 +815,7 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 
 		# Gathers the general information about each array and stores it in a variable. We'll use this repeatedly
 		#ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$lsicontroller" -a"$CURRENTARRAY")
-		ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$CURRENTARRAY" -a"$lsicontroller")
+		ARRAYINFO=$(/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -L"$CURRENTARRAY" -a"$lsicontroller" 2>/dev/null)
 
 		# Determines the number of disks on a span, and the number of spans for an array. We'll use this to calculate the
 		# RAID level that array is setup for in a moment
