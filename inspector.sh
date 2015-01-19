@@ -1013,7 +1013,7 @@ for I in ${!CARDARRAY[*]}; do
 
   elif [[ "$RAIDBRAND" == "LSI" ]]; then
 
-     LSIMODEL=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -a"$lsicontroller" | awk -F ":" '/Product Name/ {print $2}' | sed -e 's/^[ \t]*//')
+     LSIMODEL=$(/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -a"$lsicontroller" 2>/dev/null | awk -F ":" '/Product Name/ {print $2}' | sed -e 's/^[ \t]*//')
 
      echo "${DISKINFO}Controller:${RESET} #$lsicontroller"
      echo "${DISKINFO}Model Used:${RESET} $LSIMODEL"
