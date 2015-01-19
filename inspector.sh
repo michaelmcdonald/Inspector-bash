@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.1.21"
+SCRIPTVERSION="v1.5.1"
 
 
 ##################################################################################
@@ -917,6 +917,8 @@ function diskinfo {
 
 # Identify the BRAND of the RAID controller currently being used
 #RAIDBRAND=$(lspci 2>/dev/null | awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}')
+# Ran into an issue on older machines (CentOS 5.1...I presume due to the Bash version) where the single line (commented out directly above) was
+# breaking. I seperated it into two parts and that works just fine.
 CONTROLLERCOUNT=$(lspci 2>/dev/null | grep -i RAID)
 RAIDBRAND=$(awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}' <<< "$CONTROLLERCOUNT")
 

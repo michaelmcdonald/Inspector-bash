@@ -1,3 +1,13 @@
+**1.5.1 -- 1/19/2015**
+
+Corrected the command(s) that acquired the RAID controller brand as well as how
+many controllers were on a system. Older (CentOS 5) systems appeared to be 
+running a version of Bash that was unable to process my command as a single line
+so I split it into multiple parts. 
+
+Corrected version number to more accurately reflect progress made on major parts
+of the script as well as bug fixes. 
+
 **1.1.21 -- 1/19/2015**
 
 Corrected STDERR output for MegaCli commands
