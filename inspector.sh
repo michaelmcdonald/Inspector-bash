@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.5.1"
+SCRIPTVERSION="v1.5.2"
 
 
 ##################################################################################
@@ -232,7 +232,7 @@ UBUNTUVERSION=$(cat /etc/lsb-release 2>/dev/null)
 # variables: the whole version: #.#, the major and then minor version numbers (BASH_REMATCH[1] - [3] respectively
 # and then those numbers are assigned their own variable that can be called / printed to screen. Technically
 # this is all one command / execution, for readability sake it's broken across multiple lines.
-CENTOSREGEX="^.*release\ (([0-9])\.([0-9])).*$"
+CENTOSREGEX="^.*release\ (([0-9])\.([0-9]+)).*$"
 #[[ $CENTOSVERSION =~ ^.*release\ (([0-9])\.([0-9])).*$ ]] &&
 [[ $CENTOSVERSION =~ $CENTOSREGEX ]] &&
 CENTOSENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: xx.xx

@@ -1,3 +1,8 @@
+**1.5.2 -- 1/21/2015**
+
+Corrected CentOS version capture string to properly capture double digit minor
+version numbers.
+
 **1.5.1 -- 1/19/2015**
 
 Corrected the command(s) that acquired the RAID controller brand as well as how
