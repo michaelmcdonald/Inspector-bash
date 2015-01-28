@@ -920,7 +920,8 @@ function diskinfo {
 # Ran into an issue on older machines (CentOS 5.1...I presume due to the Bash version) where the single line (commented out directly above) was
 # breaking. I seperated it into two parts and that works just fine.
 CONTROLLERCOUNT=$(lspci 2>/dev/null | grep -i RAID)
-RAIDBRAND=$(awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}' <<< "$CONTROLLERCOUNT")
+RAIDBRAND=$(sed -n 's/^.*\(LSI\|Adaptec\).*$/\1/p' <<< "$CONTROLLERCOUNT")
+#RAIDBRAND=$(awk '/Adaptec|LSI/{for(i=1;i<=NF;++i)if($i~/Adaptec|LSI/)print $i}' <<< "$CONTROLLERCOUNT")
 
 # Controller counters. Identifies the physical controller being queries, and sets the counters for the
 # brand specific versioning of what controller is being queried

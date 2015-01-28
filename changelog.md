@@ -1,3 +1,9 @@
+**1.5.3 -- 1/28/2015**
+
+Altered the code that identifies which RAID cards are being used so that older
+LSI model cards (which display "LSI" twice) do not throw off the logic that
+counts how many RAID cards are present on the system. Thanks, Dooley!
+
 **1.5.2 -- 1/21/2015**
 
 Corrected CentOS version capture string to properly capture double digit minor
