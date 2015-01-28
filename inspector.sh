@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.5.2"
+SCRIPTVERSION="v1.6.0"
 
 
 ##################################################################################
@@ -84,7 +84,7 @@ fi
 function printLog {
     if [[ printLog.log ]]; then
         echo "[$(date +%s.%N)] $@" >> printLog.log
-    fi    
+    fi
 }
 
 function getTime {
@@ -106,8 +106,21 @@ function getDelta {
 #                              BEGIN  SOFTWARE CHECKS                            #
 ##################################################################################
 
-# Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
-APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
+CENTOSCHECK=$(cat /etc/redhat-release 2>/dev/null)
+
+if [[ -z $CENTOSCHECK ]]; then
+
+	APACHETEST=$(cat /etc/apache2/apache2.conf 2>/dev/null)
+
+# All else fails, we presume we're on a base CentOS install and display accordingly
+else
+
+	APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
+
+fi
+
+## Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
+#APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
 
 # Quick check against a file that will verify if MySQL IS installed or is NOT installed. This is stored in a variable
 #MYSQLTEST=$(mysql -e ' SELECT VERSION(); ' 2>/dev/null)
@@ -261,7 +274,7 @@ if [[ -z $CENTOSVERSION ]]; then
 	FULLTIMEZONE=$(</etc/timezone)
 
         echo "${SYSTEMINFO}Operating System:${RESET} Ubuntu $UBUNTUENTIREVERSION"
-	
+
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
 
 # If it's NOT empty, we examine the contents of the varible for the string "CloudLinux". If present, we presume we're on CL, if not, continue
@@ -272,7 +285,7 @@ elif [[ $CENTOSVERSION == *CloudLinux* ]]; then
         echo "${SYSTEMINFO}Operating System:${RESET} CloudLinux $CENTOSENTIREVERSION"
 
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
-	
+
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else
 
@@ -294,7 +307,7 @@ if [[ "$NUMBERUSERS" == "1" ]]; then
 elif [[ "$NUMBERUSERS" == "2" ]]; then
 
 	echo "${SYSTEMINFO}Current Users On:${RESET} 2 (you and 1 other)"
-	
+
 elif [[ "$NUMBERUSERS" -gt "2" ]]; then
 
 	echo "${SYSTEMINFO}Current Users On:${RESET} $NUMBERUSERS (you and $DISPLAYUSERS others)"
@@ -633,12 +646,22 @@ echo "${PHPINFO}Memory Limit #:${RESET} $PHPMEMLIMIT $PHPMEMLIMITDENOM"
 #                           BEGIN APACHE INFO FUNCTION                           #
 ##################################################################################
 
-
 # Function for all Apache Info related information
 function apacheinfo {
 
+if [[ -z $CENTOSCHECK ]]; then
+
+	APACHEFULLINFO=$(apache2ctl -V)
+
+# All else fails, we presume we're on a base CentOS install and display accordingly
+else
+
+	APACHEFULLINFO=$(httpd -V)
+
+fi
+
 # Grabs / stores the contents of the http -V command for later parsing
-APACHEFULLINFO=$(httpd -V)
+#APACHEFULLINFO=$(httpd -V)
 
 # Grabs the netstat info for later parsing to find the number of active connections
 NETSTATINFO=$(netstat -nap 2>/dev/null)
@@ -868,7 +891,7 @@ elif [[ "$RAIDBRAND" == "Adaptec" ]];then
         firstarray=$(/usr/StorMan/arcconf getconfig $controller ld | awk '/Logical device number/ {print; count++; if (count=1) exit}')
 	firstarrayregex="([0-9])\.*$"
 	[[ $firstarray =~ $firstarrayregex ]] &&
-	CURRENTARRAY=${BASH_REMATCH[1]} 
+	CURRENTARRAY=${BASH_REMATCH[1]}
 
         # For loop that runs through the arrays, increasing the iteration counter each time, and gathers the various
         # pieces of information relating to each array and displaying it accordingly.
@@ -1104,8 +1127,26 @@ fi
 # Start varnishinfo function
 function varnishinfo {
 
-# Tests to see if Varnish is present and if so records the version string
-VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>/dev/null)
+if [ ! -x /usr/sbin/varnishd ] && [ ! -x /opt/varnish/sbin/varnishd ]; then
+
+echo -n
+
+else
+
+CENTOSCHECK=$(cat /etc/redhat-release 2>/dev/null)
+UBUNTUCHECK=$(cat /etc/lsb-release 2>/dev/null)
+
+if [[ -z $UBUNTUCHECK ]]; then
+
+	#VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>/dev/null)
+	VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>&1)
+
+else
+	# Tests to see if Varnish is present and if so records the version string
+	#VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>/dev/null)
+	VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>&1)
+
+fi
 
 ## Grab the version of Varnish currently installed on the system
 VARNISHREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
@@ -1120,16 +1161,17 @@ VARNISHBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 if [[ ! -z "$VARNISHVOUTPUT" ]]; then
 
 
-echo
-
 echo "------------\\${VARNISHINFO} ${UNDERLINE}VARNISH INFO${RESET} \\----------------------------------"
 
 echo
 
 echo "${VARNISHINFO}Version In Use:${RESET} ${VARNISHENTIREVERSION}"
 
+echo
+
 fi
 
+fi
 }
 
 ##################################################################################
@@ -1226,8 +1268,6 @@ fi
 
 
 
-
-
 ##################################################################################
 #                         BEGIN SOFTWARE ONLY LOGIC FUNCTION                     #
 ##################################################################################
@@ -1293,101 +1333,6 @@ fi
 ##################################################################################
 #                           END SOFTWARE ONLY LOGIC FUNCTION                     #
 ##################################################################################
-
-
-
-
-##################################################################################
-#                            BEGIN TRAFFIC INFO FUNCTION                         #
-##################################################################################
-
-# Begin trafficinfo function
-function trafficinfo {
-
-# Grab the current date. We'll use this to examine the logs for today's entries only
-NOW=$(date +"%d/%b/%Y")
-
-# Using the current date, store all the entries from all domlogs into a variable that we can reference
-# repeatedly without having to call upon that data over and over again
-DOMLOGINFO=$(grep "$NOW:" /home/domlogs/*)
-
-# Variable storing the output of the netstat command so that I could use the same information across
-# multiple aspects of this script without having to call netstat each time
-NETSTATINFO=$(netstat -nap)
-
-# Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
-# and then pipes that into an array. Each unique entry (see: domain) gets it's own line. Any duplicate entries
-# (meaning domains receiving multiple POST requests) will be tallied up and a number displayed next to them
-DOMAINREQS=$(awk -F":" '/POST/ {h[$1]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | sort -n)
-
-# Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
-# and then pipes that into an array. Each unique entry (see: IP address) gets it's own line. Any duplicate entries
-# (meaning IPs sending multiple POST requests) will be tallied up and a number displayed next to them
-IPREQS=$(awk -F '[: ]' '/POST/ {h[$2]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t)
-
-# Funnel the domlog data into an awk statement that will search for only entries that are a POST requests
-# and then pipes that into an array. Each unique entry (see: file) gets it's own line. Any duplicate entries
-# (meaning files receiving multiple POST requests) will be tallied up and a number displayed next to them
-FILEREQS=$(awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' <<< "$DOMLOGINFO" | column -t | head -n5)
-
-# Couple of awk statements that parse through the netstat info and gathers the current IP addresses with
-# connections and how many connections each has
-TOPIPCONNS=$(awk '/:80/ {print $5}' <<< "$NETSTATINFO" | awk -F":" '{h[$1]++}; END { for(k in h) print k, h[k] }')
-
-# Uses the netstatinfo variable to identify the total number of connections currently on port 80
-ACTIVECONNS=$(grep :80 <<< "$NETSTATINFO" | wc -l)
-
-# Uses the output of the $DOMAINREQS variable to identify the website that had the most posts requests
-HITTER=$(awk 'NR==1{print $1}' <<< "$DOMAINREQS" | cut -d "/" -f4)
-
-DOMAINFILES=$(grep "$NOW:" /home/domlogs/$HITTER | awk '/POST/ {h[$7]++}; END { for(k in h) print k, h[k] }' | column -t | head -n5)
-
-
-echo
-
-echo "-----------\ ${TRAFFICINFO}${UNDERLINE}TRAFFIC INFO${RESET} \-------------------------------"
-
-echo
-
-echo "${TRAFFICINFO}# of connections active now on port 80:${RESET} $ACTIVECONNS"
-
-echo
-
-echo "${TRAFFICINFO}Top IPs and # of connections each made:${RESET}"
-
-awk '{print $2,$1}' <<< "$TOPIPCONNS" | column -t
-
-echo
-
-echo "${TRAFFICINFO}# of connections domains are receiving:${RESET}"
-
-awk '{print $2 "  " $1}' <<< "$DOMAINREQS"
-
-echo
-
-echo "${TRAFFICINFO}Connections and IPs with POST requests:${RESET}"
-
-awk '{print $2 "  " $1}' <<< "$IPREQS"
-
-echo
-
-echo "${TRAFFICINFO}Files receiving the most POST requests:${RESET}"
-
-awk '{print $2 "  " $1}' <<< "$FILEREQS"
-
-echo
-
-echo "${TRAFFICINFO}Files with most POST requests on $HITTER${RESET}"
-
-awk '{print $2 "  " $1}' <<< "$DOMAINFILES"
-
-echo
-}
-
-##################################################################################
-#                            END TRAFFIC INFO FUNCTION                           #
-##################################################################################
-
 
 
 
@@ -1467,12 +1412,6 @@ do
 	    optionran="true"
 	    unset -f header_color
             ;;
-	--traffic | -t)
-	    header_color 2>/dev/null
-	    trafficinfo
-	    optionran="true"
-	    unset -f header_color
-	    ;;
         *)
 	    header_color 2>/dev/null
             echo

@@ -1,3 +1,13 @@
+**1.6.0 -- 1/28/2015**
+
+Overhauled the Varnish checks to actually work, and made the Varnish and
+Apache checks work appropriately on Ubuntu machines.
+
+**1.5.4 -- 1/28/2015**
+
+Removed defunct traffic function has this has been re-written as a separate 
+script in Perl called "Trafficam".
+
 **1.5.3 -- 1/28/2015**
 
 Altered the code that identifies which RAID cards are being used so that older
