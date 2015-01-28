@@ -1,3 +1,7 @@
+**1.6.1 -- 1/28/2015**
+
+Corrected some spacing issues
+
 **1.6.0 -- 1/28/2015**
 
 Overhauled the Varnish checks to actually work, and made the Varnish and

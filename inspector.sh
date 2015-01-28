@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.0"
+SCRIPTVERSION="v1.6.1"
 
 
 ##################################################################################
@@ -701,6 +701,8 @@ echo "${APACHEINFO}MPM Being Used:${RESET} $APACHEMPM"
 
 #echo "${APACHEINFO}Connections In:${RESET} $NUMOFCONNS"
 
+echo
+
 }
 
 ##################################################################################
@@ -1079,7 +1081,7 @@ function nginxinfo {
 
 if [[ ! -x /usr/sbin/nginx ]]; then
 
-echo
+echo -n
 
 else
 
@@ -1098,7 +1100,6 @@ NGINXBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 # If the Nginx version can be found, continue, otherwise do nothing
 if [[ ! -z "$NGINXVOUTPUT" ]]; then
 
-	echo
 
 	echo "------------\\${NGINXINFO} ${UNDERLINE}NGINX INFO${RESET} \\----------------------------------"
 
@@ -1107,6 +1108,7 @@ if [[ ! -z "$NGINXVOUTPUT" ]]; then
 
 	echo "${NGINXINFO}Version In Use:${RESET} ${NGINXENTIREVERSION}"
 
+echo
 
 fi
 
