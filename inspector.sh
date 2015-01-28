@@ -910,7 +910,7 @@ elif [[ "$RAIDBRAND" == "Adaptec" ]];then
 		ADAPTECRAID=$(awk -F":" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /RAID level/ {print $2}' <<< "$ARRAYINFO")
 
 		# Let us know what array this information applies to. This is NOT the logical array position.
-		echo "${DISKINFO}RAID Array:${RESET} #$CURRENTARRAY"
+		echo "${DISKINFO}${UNDERLINE}RAID Array #$CURRENTARRAY"${RESET}
 
 		# Displays the number of disks involved in the array and the RAID level
 		echo "${DISKINFO}# of Disks:${RESET}" $ADAPTECDISKS
