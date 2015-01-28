@@ -854,7 +854,8 @@ if [[ "$RAIDBRAND" == "LSI" ]];then
 		LSIRAIDPRIMARY=$(awk -F"-" '/Primary/ {gsub(/,.*/,""); print $2}' <<< "$ARRAYINFO")
 
 		# Let us know what array this information applies to. This is NOT the logical array position.
-		echo "${DISKINFO}RAID Array:${RESET} #$CURRENTARRAY"
+		echo "${DISKINFO}${UNDERLINE}RAID Array #$CURRENTARRAY"${RESET}
+		#echo "${DISKINFO}RAID Array:${RESET} #$CURRENTARRAY"
 
 		# Displays the number of disks, spans, and the actual RAID level
 		echo "${DISKINFO}# of Disks:${RESET}" $LSINUMBERDISKS
