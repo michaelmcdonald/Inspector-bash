@@ -1102,7 +1102,7 @@ NGINXBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 if [[ ! -z "$NGINXVOUTPUT" ]]; then
 
 
-	echo "------------\\${NGINXINFO} ${UNDERLINE}NGINX INFO${RESET} \\----------------------------------"
+	echo "------------\\${NGINXINFO} ${UNDERLINE}NGINX INFO${RESET} \\--------------------------------"
 
 	echo
 
@@ -1164,7 +1164,7 @@ VARNISHBUILDVERSION=${BASH_REMATCH[4]}     # The build version #: xx
 if [[ ! -z "$VARNISHVOUTPUT" ]]; then
 
 
-echo "------------\\${VARNISHINFO} ${UNDERLINE}VARNISH INFO${RESET} \\----------------------------------"
+echo "------------\\${VARNISHINFO} ${UNDERLINE}VARNISH INFO${RESET} \\------------------------------"
 
 echo
 
