@@ -1,3 +1,7 @@
+**1.6.2 -- 1/29/2015**
+
+Corrected additional spacing issues
+
 **1.6.1 -- 1/28/2015**
 
 Corrected some spacing issues

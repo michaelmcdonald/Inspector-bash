@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.1"
+SCRIPTVERSION="v1.6.2"
 
 
 ##################################################################################
@@ -186,6 +186,7 @@ echo " ${YELLOW}| |_| | (_| | (_| | (_| |  __/ |_    ${RESET} /                "
 echo " ${YELLOW} \____|\__,_|\__,_|\__, |\___|\__| ${RESET}  / $SCRIPTVERSION           "
 echo " ${YELLOW}                   |___/ ${RESET}      "
 
+echo
 }
 
 
@@ -223,7 +224,6 @@ PROCESSORCOUNT=$(getconf _NPROCESSORS_ONLN)
 # Record the current 1 min load average
 LOADAVERAGE=$(cat /proc/loadavg | awk '{print $1}')
 
-echo
 
 echo "------------\\${SYSTEMINFO} ${UNDERLINE}SYSTEM INFO${RESET} \\-------------------------------"
 
@@ -1394,6 +1394,7 @@ do
             ;;
 	--no-header | -nh)
 	    unset -f header_color
+	    echo
 	    ;;
         --all | -a)
 	    header_color 2>/dev/null
