@@ -1,3 +1,7 @@
+**1.6.3 -- 1/30/2015**
+
+Corrected issue with a "bc" command not working correctly on CentOS 7
+
 **1.6.2 -- 1/29/2015**
 
 Corrected additional spacing issues

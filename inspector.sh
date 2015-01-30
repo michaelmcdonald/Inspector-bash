@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.2"
+SCRIPTVERSION="v1.6.3"
 
 
 ##################################################################################
@@ -298,7 +298,7 @@ else
 fi
 
 NUMBERUSERS=$(users | wc -w)
-DISPLAYUSERS=$(echo "$NUMBERUSERS-1" | bc)
+DISPLAYUSERS=$(echo "$NUMBERUSERS-1" | bc 2>/dev/null)
 
 if [[ "$NUMBERUSERS" == "1" ]]; then
 
