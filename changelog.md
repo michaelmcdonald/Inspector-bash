@@ -1,3 +1,7 @@
+**1.6.4 -- 1/30/2015**
+
+Corrected issue with date / timezone functionality on CentOS 7
+
 **1.6.3 -- 1/30/2015**
 
 Corrected issue with a "bc" command not working correctly on CentOS 7

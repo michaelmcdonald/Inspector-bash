@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.3"
+SCRIPTVERSION="v1.6.4"
 
 
 ##################################################################################
@@ -285,6 +285,13 @@ elif [[ $CENTOSVERSION == *CloudLinux* ]]; then
         echo "${SYSTEMINFO}Operating System:${RESET} CloudLinux $CENTOSENTIREVERSION"
 
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
+
+elif [[ $CENTOSMAJORVERSION == "7" ]]; then
+	FULLTIMEZONE=$(timedatectl | awk '/Timezone:/ {print $2}')
+
+        echo "${SYSTEMINFO}Operating System:${RESET} CentOS $CENTOSENTIREVERSION"
+
+        echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
 
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else
