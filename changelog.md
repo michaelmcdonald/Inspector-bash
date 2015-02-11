@@ -1,3 +1,9 @@
+**1.6.5 -- 2/11/2015**
+
+Corrected an issue where the cPanel release was displaying the numerical 
+version if LTS was selected (since the cpupdate.conf file only displayed
+that). Now we test for a number and display "LTS" if one is found.
+
 **1.6.4 -- 1/30/2015**
 
 Corrected issue with date / timezone functionality on CentOS 7

@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.4"
+SCRIPTVERSION="v1.6.5"
 
 
 ##################################################################################
@@ -729,8 +729,14 @@ function cpanelinfo {
 # Grab the cPanel version number
 CPANELVERSION=$(</usr/local/cpanel/version)
 
-# Inspects the cPanel release tier
+# Inspects the cPanel release tier, if the variables in the cpupdate.conf file is number, the release is set to LTS
+# and we identify that, otherwise we display what is there since it will match the appropriate release
+RELEASEREGEX="^[0-9]+([.][0-9]+)?$"
 CPANELRELEASE=$(awk -F"=" ' /CPANEL/ {print $2}' /etc/cpupdate.conf)
+
+if [[ $CPANELRELEASE =~ $RELEASEREGEX ]]; then
+	CPANELRELEASE="LTS";
+fi
 
 ## Determines if legacy cPanel backups are enabled
 #CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
