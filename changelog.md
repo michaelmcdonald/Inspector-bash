@@ -1,3 +1,8 @@
+**1.6.6 -- 2/11/2015**
+
+Corrected an issue where a space in the /etc/my.cnf file separating the
+variable name from the value was causing a miscalculation in my math.
+
 **1.6.5 -- 2/11/2015**
 
 Corrected an issue where the cPanel release was displaying the numerical 

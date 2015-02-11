@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.5"
+SCRIPTVERSION="v1.6.6"
 
 
 ##################################################################################
@@ -439,7 +439,7 @@ MYSQLCONF=$(cat /etc/my.cnf 2>/dev/null)
 INNODBPRESENT=$(awk '/innodb_buffer_pool_size/' <<< "$MYSQLCONF")
 
 # This will take the value that's assigned to the InnoDB Buffer Pool (should it exist) and store the value
-INNODBVALUE=$(awk -F"=" '/innodb_buffer_pool_size/ {print $2}'i <<< "$MYSQLCONF")
+INNODBVALUE=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /innodb_buffer_pool_size/ {print $2}'i <<< "$MYSQLCONF")
 
 # Grabs just the value for the buffer pool
 INNODBVALNUMREGEX="(([0-9]+)).*$"
