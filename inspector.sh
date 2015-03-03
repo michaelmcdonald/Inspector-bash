@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.8"
+SCRIPTVERSION="v1.6.9"
 
 
 ##################################################################################
@@ -1013,7 +1013,7 @@ else
 		
 	else
 	
-		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)'
+		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]\%)'
 		
 	fi
 

@@ -1,3 +1,8 @@
+**1.6.8 & 1.6.9 -- 3/3/2015**
+
+Corrected version number as well as altered the number of lines 
+displayed for a grep in the DISK INFO section.
+
 **1.6.7 -- 3/3/2015**
 
 Altered the DISK INFO section that reports on actual disk usage to 
