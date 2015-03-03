@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.7"
+SCRIPTVERSION="v1.6.8"
 
 
 ##################################################################################
