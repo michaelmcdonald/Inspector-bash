@@ -1,3 +1,9 @@
+**1.6.7 -- 3/3/2015**
+
+Altered the DISK INFO section that reports on actual disk usage to 
+highlight any values that are over 80%. This will allow for a more
+easily recognized issue with disk usage.
+
 **1.6.6 -- 2/11/2015**
 
 Corrected an issue where a space in the /etc/my.cnf file separating the

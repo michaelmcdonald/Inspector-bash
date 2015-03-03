@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.6"
+SCRIPTVERSION="v1.6.7"
 
 
 ##################################################################################
@@ -985,16 +985,37 @@ echo
 
 echo "${DISKINFO}Disk Usage:${RESET}"
 
+COLORSANDF=$(paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)')
+
+COLORDF=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)')
+
 # I'm not concerned with showing all the SAN mounts. This examines the fstab file and uses the SAN mount entries there as a list
 # for what to remove from the actual disk usage display
 if grep -q \#zbind "/etc/fstab"; then
 
 # Some gnarly uses of the paste and column commands that allow me to interject the inode usage % inline with the disk usage display
-	paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t)
+
+	if [[ "$COLORSANDF" == "" ]]; then
+		
+		paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t)
+		
+	else
+	
+		paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)'
+		
+	fi
 
 else
 
-	paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t)
+	if [[ "$COLORDF" == "" ]]; then
+	
+		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t)
+		
+	else
+	
+		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)'
+		
+	fi
 
 fi
 
