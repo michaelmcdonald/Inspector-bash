@@ -985,7 +985,7 @@ echo
 
 echo "${DISKINFO}Disk Usage:${RESET}"
 
-COLORSANDF=$(paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 5 -A 5 '([8-9]+[0-9]\%)')
+COLORSANDF=$(paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]\%)')
 
 COLORDF=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]\%)')
 
