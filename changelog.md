@@ -1,3 +1,8 @@
+**1.6.10 -- 3/5/2015**
+
+Corrected the DISK INFO function so it would highlight disk usage
+that was at exactly 100% used.
+
 **1.6.8 & 1.6.9 -- 3/3/2015**
 
 Corrected version number as well as altered the number of lines 
