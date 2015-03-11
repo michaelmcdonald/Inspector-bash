@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.10"
+SCRIPTVERSION="v1.6.11"
 
 
 ##################################################################################
@@ -51,22 +51,15 @@ YELLOW=$(tput setaf 226)
 RESET=$(tput sgr0)
 
 
-# Global variables that any function can use
-
-
 # Logic to test the PHP binary so that we can get the information we need on a cPanel or none server
 #ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
 
 PHPBINARYTEST=$(/usr/local/bin/php -i 2>/dev/null)
 
 if [[ "$PHPBINARYTEST" == "" ]]; then
-
         ACTUALPHPINI=$(php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
-
 else
-
         ACTUALPHPINI=$(/usr/local/bin/php -i 2>/dev/null | grep "Loaded Configuration File" | awk '{print $5}')
-
 fi
 
 
@@ -109,14 +102,10 @@ function getDelta {
 CENTOSCHECK=$(cat /etc/redhat-release 2>/dev/null)
 
 if [[ -z $CENTOSCHECK ]]; then
-
 	APACHETEST=$(cat /etc/apache2/apache2.conf 2>/dev/null)
-
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else
-
 	APACHETEST=$(cat /etc/httpd/conf/httpd.conf 2>/dev/null)
-
 fi
 
 ## Quick check against a file that will verify if Apache IS installed or is NOT installed. This is stored in a variable
@@ -230,9 +219,7 @@ echo "------------\\${SYSTEMINFO} ${UNDERLINE}SYSTEM INFO${RESET} \\------------
 echo
 
 echo "${SYSTEMINFO}System Processor:${RESET} $PROCESSORTYPE"
-
 echo "${SYSTEMINFO}Total # of Cores:${RESET} $PROCESSORCOUNT"
-
 echo "${SYSTEMINFO}Current Load Avg:${RESET} $LOADAVERAGE"
 
 # Capturing the OS version strings
@@ -270,53 +257,33 @@ UBUNTUMINORVERSION=${BASH_REMATCH[3]}     # The minor version #: x
 
 # Checking to see if the variable $CENTOSVERSION is empty or not. If it IS empty we proceed to believe we're on Ubuntu
 if [[ -z $CENTOSVERSION ]]; then
-
 	FULLTIMEZONE=$(</etc/timezone)
-
         echo "${SYSTEMINFO}Operating System:${RESET} Ubuntu $UBUNTUENTIREVERSION"
-
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
-
 # If it's NOT empty, we examine the contents of the varible for the string "CloudLinux". If present, we presume we're on CL, if not, continue
 elif [[ $CENTOSVERSION == *CloudLinux* ]]; then
-
 	FULLTIMEZONE=$(cat /etc/sysconfig/clock | awk -F"\"" '{print $2}')
-
         echo "${SYSTEMINFO}Operating System:${RESET} CloudLinux $CENTOSENTIREVERSION"
-
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
-
 elif [[ $CENTOSMAJORVERSION == "7" ]]; then
 	FULLTIMEZONE=$(timedatectl | awk '/Timezone:/ {print $2}')
-
         echo "${SYSTEMINFO}Operating System:${RESET} CentOS $CENTOSENTIREVERSION"
-
         echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
-
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else
-
 	FULLTIMEZONE=$(cat /etc/sysconfig/clock | awk -F"\"" '{print $2}')
-
         echo "${SYSTEMINFO}Operating System:${RESET} CentOS $CENTOSENTIREVERSION"
-
 	echo "${SYSTEMINFO}Server Time Zone:${RESET}" `date +%Z` $FULLTIMEZONE
-
 fi
 
 NUMBERUSERS=$(users | wc -w)
 DISPLAYUSERS=$(echo "$NUMBERUSERS-1" | bc 2>/dev/null)
 
 if [[ "$NUMBERUSERS" == "1" ]]; then
-
 	echo "${SYSTEMINFO}Current Users On:${RESET} 1 (just you)"
-
 elif [[ "$NUMBERUSERS" == "2" ]]; then
-
 	echo "${SYSTEMINFO}Current Users On:${RESET} 2 (you and 1 other)"
-
 elif [[ "$NUMBERUSERS" -gt "2" ]]; then
-
 	echo "${SYSTEMINFO}Current Users On:${RESET} $NUMBERUSERS (you and $DISPLAYUSERS others)"
 fi
 }
@@ -375,11 +342,8 @@ echo "------------\\${MEMORYINFO} ${UNDERLINE}MEMORY INFO${RESET} \\------------
 echo
 
 echo "${MEMORYINFO}System Total:${RESET} $TOTALMEMGB G"
-
 echo "${MEMORYINFO}Current Used:${RESET} $MEMUSED M"
-
 echo "${MEMORYINFO}Current Free:${RESET} $MEMTRUEFREE M"
-
 echo "${MEMORYINFO}Current Swap:${RESET} $SWAPUSED M"
 
 }
@@ -461,17 +425,11 @@ MYSQLINNODB=$(awk '{size = $1 / 1024 / 1024 ; print size " M"} ' <<< "$INNODBVAL
 # in MiB through the $MYSQLINNODB variable, if already in MiB it displays that value per the $INNODBVALUE variable
 
 if [[ "$INNODBPRESENT" == "" ]];then
-
         echo "${MYSQLINFO}Current InnoDB:${RESET} 128 MB (default)"
-
 elif [[ $INNODBVALUE == *M ]] || [[ $INNODBVALUE == *G ]]; then
-
 	echo "${MYSQLINFO}Current InnoDB:${RESET} $INNODBNUMVALUE $INNODBDENOM"
-
 else
-
         echo "${MYSQLINFO}Current InnoDB:${RESET} $MYSQLINNODB"
-
 fi
 
 ########## MYISAM KEY BUFFER SIZE LOGIC ###############
@@ -503,17 +461,11 @@ MYSQLMYISAM=$(awk '{size = $1 / 1024 / 1024 ; print size " M"} ' <<< "$MYISAMVAL
 # in MiB through the $MYSQLMYISAM variable, if already in MiB it displays that value per the $MYISAMVALUE variable
 
 if [[ "$MYISAMPRESENT" == "" ]];then
-
         echo "${MYSQLINFO}Current MyISAM:${RESET} 8 M (default)"
-
 elif [[ $MYISAMVALUE == *M ]] || [[ $MYISAMVALUE == *G ]];then
-
         echo "${MYSQLINFO}Current MyISAM:${RESET} $MYISAMNUMVALUE $MYISAMDENOM"
-
 else
-
         echo "${MYSQLINFO}Current MyISAM:${RESET} $MYSQLMYISAM"
-
 fi
 
 }
@@ -572,21 +524,13 @@ FCGIHANDLER=$(awk 'match($0,/fcgid/) {print substr($0,RSTART,RLENGTH)}' <<< "$PH
 
 
 if [[ ! -z "$FCGIHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} fCGI"
-
+	echo "${PHPINFO}Handler In Use:${RESET} fCGI"
 elif [[ ! -z "$SUPHPHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
-
+	echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
 elif [[ ! -z "$DSOHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} DSO"
-
+	echo "${PHPINFO}Handler In Use:${RESET} DSO"
 elif [[ ! -z "$CGIHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} CGI"
-
+	echo "${PHPINFO}Handler In Use:${RESET} CGI"
 fi
 
 
@@ -601,21 +545,13 @@ DSOHANDLER=$(awk 'match($0,/libphp5/) {print substr($0,RSTART,RLENGTH)}' <<< "$P
 FCGIHANDLER=$(awk 'match($0,/fcgid/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
 
 if [[ ! -z "$FCGIHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} fCGI"
-
+	echo "${PHPINFO}Handler In Use:${RESET} fCGI"
 elif [[ ! -z "$SUPHPHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
-
+	echo "${PHPINFO}Handler In Use:${RESET} SuPHP"
 elif [[ ! -z "$DSOHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} DSO"
-
+	echo "${PHPINFO}Handler In Use:${RESET} DSO"
 elif [[ ! -z "$CGIHANDLER" ]]; then
-
-echo "${PHPINFO}Handler In Use:${RESET} CGI"
-
+	echo "${PHPINFO}Handler In Use:${RESET} CGI"
 fi
 
 fi
@@ -985,9 +921,9 @@ echo
 
 echo "${DISKINFO}Disk Usage:${RESET}"
 
-COLORSANDF=$(paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]+\%)')
+COLORSANDF=$(paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '[8-9][0-9]\%|100\%')
 
-COLORDF=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]+\%)')
+COLORDF=$(paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '[8-9][0-9]\%|100\%')
 
 # I'm not concerned with showing all the SAN mounts. This examines the fstab file and uses the SAN mount entries there as a list
 # for what to remove from the actual disk usage display
@@ -1001,7 +937,7 @@ if grep -q \#zbind "/etc/fstab"; then
 		
 	else
 	
-		paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]+\%)'
+		paste <(df -h | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | grep -v "$(awk '/\#zbind/ {print $1}' /etc/fstab)" | grep -v '^ ' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '[8-9][0-9]\%|100\%'
 		
 	fi
 
@@ -1013,7 +949,7 @@ else
 		
 	else
 	
-		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '([8-9]+[0-9]+\%)'
+		paste <(df -h | awk '{ $6=""; $7=""; print }' | column -t) <(df -hi | sed 's/on//' | awk '{print substr($0, index($0, $5))}' | column -t) | egrep --color -B 50 -A 50 '[8-9][0-9]\%|100\%'
 		
 	fi
 

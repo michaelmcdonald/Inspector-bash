@@ -1,3 +1,7 @@
+**1.6.11 -- 3/11/2015**
+
+Corrected egrep / regex so it highlights all numbers (including 100%)
+
 **1.6.10 -- 3/5/2015**
 
 Corrected the DISK INFO function so it would highlight disk usage
