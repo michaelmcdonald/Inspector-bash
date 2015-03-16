@@ -1,3 +1,8 @@
+**1.6.12 --3/16/2015**
+
+Corrected an issue where cPanel Legacy Backups were not registered after
+cPanel released an update that changed the file where the setting was set
+
 **1.6.11 -- 3/11/2015**
 
 Corrected egrep / regex so it highlights all numbers (including 100%)

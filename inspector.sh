@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.11"
+SCRIPTVERSION="v1.6.12"
 
 
 ##################################################################################
@@ -674,11 +674,9 @@ if [[ $CPANELRELEASE =~ $RELEASEREGEX ]]; then
 	CPANELRELEASE="LTS";
 fi
 
-## Determines if legacy cPanel backups are enabled
-#CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf)
-#
-## Determines if the new cPanel backups are enabled
-#CPANELBACKUP=$(awk -F" " ' {gsub(/^[ \t]+|[ \t]+$/, "", $2)} /BACKUPENABLE/ {gsub( "['\'']","" ); print $2}' /var/cpanel/backups/config)
+# A cPanel update (around March 2015) created a new file for storing the setting of Legacy Backups. Need to create a quick check to see
+# if we're running the new(er) version or not so that we examine the correct file
+LEGACYCHECK=$(cat /etc/cpbackup.conf 2>/dev/null)
 
 # This parses the cPanel version and breaks it down into the individual components of the version number with each part
 # being stored as a separate variable. These individual components are not being utilized but provide the ability to
@@ -695,14 +693,14 @@ CPANELREVISIONVERSION=${BASH_REMATCH[5]}   # The revision version #: xx
 
 # Because older versions of cPanel set the backup status in a different file
 if [[ "$CPANELMINORVERSION" -le "32" ]]; then
-
         CPANELLEGACY=$(awk -F" " ' /BACKUPACCTS/ {print $2}' /etc/cpbackup.conf)
-
 else
-
+	if [[ -z $LEGACYCHECK ]]; then
+		CPANELLEGACY=$(awk -F" " ' /BACKUPACCTS/ {print $2}' /etc/cpbackup.public.conf)
+	else
 # Determines if legacy cPanel backups are enabled
-        CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf 2>/dev/null)
-
+        	CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf 2>/dev/null)
+	fi
 fi
 
 # Determines if the new cPanel backups are enabled
