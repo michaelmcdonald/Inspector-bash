@@ -1,4 +1,8 @@
-**1.6.12 --3/16/2015**
+**1.6.13 -- 3/16/2015**
+
+Typo on my part from the last fix. Corrected.
+
+**1.6.12 -- 3/16/2015**
 
 Corrected an issue where cPanel Legacy Backups were not registered after
 cPanel released an update that changed the file where the setting was set

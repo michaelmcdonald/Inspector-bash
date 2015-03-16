@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.12"
+SCRIPTVERSION="v1.6.13"
 
 
 ##################################################################################
@@ -696,7 +696,7 @@ if [[ "$CPANELMINORVERSION" -le "32" ]]; then
         CPANELLEGACY=$(awk -F" " ' /BACKUPACCTS/ {print $2}' /etc/cpbackup.conf)
 else
 	if [[ -z $LEGACYCHECK ]]; then
-		CPANELLEGACY=$(awk -F" " ' /BACKUPACCTS/ {print $2}' /etc/cpbackup.public.conf)
+		CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.public.conf)
 	else
 # Determines if legacy cPanel backups are enabled
         	CPANELLEGACY=$(awk -F" " ' /BACKUPENABLE/ {print $2}' /etc/cpbackup.conf 2>/dev/null)
