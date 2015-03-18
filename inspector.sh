@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.13"
+SCRIPTVERSION="v1.6.14"
 
 
 ##################################################################################
@@ -378,7 +378,7 @@ MYSQLVERSION=$(awk '{gsub(/,/,""); print $5}'i <<< "$MYSQLOUTPUT")
 # major, minor, and build values. The individual breakdown of the version number is there in case any type of logic
 # needs to be used to examine version numbers against one another. More for historical / future uses than anything.
 
-MYSQLREGEX="(([0-9])\.([0-9])\.([0-9][0-9])).*$"
+MYSQLREGEX="(([0-9]+)\.([0-9]+)\.([0-9][0-9])).*$"
 #[[ $MYSQLVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
 [[ $MYSQLVERSION =~ $MYSQLREGEX ]] &&
 MYSQLENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
@@ -558,7 +558,8 @@ fi
 
 
 # Grabs just the value for the memory_limit
-PHPCONFVALREGEX="(([0-9][0-9])).*$"
+#PHPCONFVALREGEX="(([0-9][0-9])).*$"
+PHPCONFVALREGEX="([0-9]+).*$"
 #[[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
 [[ $PHPGLOBALCONF =~ $PHPCONFVALREGEX ]] &&
 PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit

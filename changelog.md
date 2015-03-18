@@ -1,3 +1,8 @@
+**1.6.14 -- 3/18/2015**
+
+Corrected a capture error where the PHP memory_limit value was only
+capturing the first two digits.
+
 **1.6.13 -- 3/16/2015**
 
 Typo on my part from the last fix. Corrected.
