@@ -1,3 +1,9 @@
+**1.6.16 -- 3/25/2015**
+
+Corrected how the key_buffer value was grabbed since a commented out
+line stating #key_buffer could have been grabbed / produced a false
+value for the buffer size
+
 **1.6.15 -- 3/25/2015**
 
 Corrected an output issue with the apache2ctl command
