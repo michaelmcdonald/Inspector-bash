@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.14"
+SCRIPTVERSION="v1.6.15"
 
 
 ##################################################################################
@@ -379,7 +379,6 @@ MYSQLVERSION=$(awk '{gsub(/,/,""); print $5}'i <<< "$MYSQLOUTPUT")
 # needs to be used to examine version numbers against one another. More for historical / future uses than anything.
 
 MYSQLREGEX="(([0-9]+)\.([0-9]+)\.([0-9][0-9])).*$"
-#[[ $MYSQLVERSION =~ (([0-9])\.([0-9])\.([0-9][0-9])).*$ ]] &&
 [[ $MYSQLVERSION =~ $MYSQLREGEX ]] &&
 MYSQLENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 MYSQLMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
@@ -407,13 +406,11 @@ INNODBVALUE=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /innodb_buffer_pool_s
 
 # Grabs just the value for the buffer pool
 INNODBVALNUMREGEX="(([0-9]+)).*$"
-#[[ $INNODBVALUE =~ (([0-9]+)).*$ ]] &&
 [[ $INNODBVALUE =~ $INNODBVALNUMREGEX ]] &&
 INNODBNUMVALUE=${BASH_REMATCH[1]} # Only the value
 
 #Grabs just the alpha character denoting the memory denomination
 INNODBVALALPHREGEX="([A-Za-z]).*$"
-#[[ $INNODBVALUE =~ ([A-Za-z]).*$ ]] &&
 [[ $INNODBVALUE =~ $INNODBVALALPHREGEX ]] &&
 INNODBDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
@@ -442,13 +439,11 @@ MYISAMVALUE=$(awk -F"=" '/key_buffer/ {print $2}'i <<< "$MYSQLCONF")
 
 # Grabs just the value for the buffer pool
 MYISAMVALNUMREGEX="(([0-9]+)).*$"
-#[[ $MYISAMVALUE =~ (([0-9]+)).*$ ]] &&
 [[ $MYISAMVALUE =~ $MYISAMVALNUMREGEX ]] &&
 MYISAMNUMVALUE=${BASH_REMATCH[1]} # Only the value
 
 #Grabs just the alpha character denoting the memory denomination
 MYISAMVALALPHREGEX="([A-Za-z]).*$"
-#[[ $MYISAMVALUE =~ ([A-Za-z]).*$ ]] &&
 [[ $MYISAMVALUE =~ $MYISAMVALALPHREGEX ]] &&
 MYISAMDENOM=${BASH_REMATCH[1]} # The memory denomination being used
 
@@ -499,7 +494,6 @@ echo
 
 ## Grab the version of PHP currently installed on the system
 PHPREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
-#[[ $PHPVOUTPUT =~ (([0-9])\.([0-9]+)\.([0-9]+)).*$ ]] &&
 [[ $PHPVOUTPUT =~ $PHPREGEX ]] &&
 PHPENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 PHPMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
@@ -521,7 +515,6 @@ CGIHANDLER=$(awk 'match($0,/cgi-sys/) {print substr($0,RSTART,RLENGTH)}' <<< "$P
 SUPHPHANDLER=$(awk 'match($0,/suphp/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
 DSOHANDLER=$(awk 'match($0,/libphp5/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
 FCGIHANDLER=$(awk 'match($0,/fcgid/) {print substr($0,RSTART,RLENGTH)}' <<< "$PHPCONF")
-
 
 if [[ ! -z "$FCGIHANDLER" ]]; then
 	echo "${PHPINFO}Handler In Use:${RESET} fCGI"
@@ -558,21 +551,13 @@ fi
 
 
 # Grabs just the value for the memory_limit
-#PHPCONFVALREGEX="(([0-9][0-9])).*$"
 PHPCONFVALREGEX="([0-9]+).*$"
-#[[ $PHPGLOBALCONF =~ (([0-9][0-9])).*$ ]] &&
 [[ $PHPGLOBALCONF =~ $PHPCONFVALREGEX ]] &&
 PHPMEMLIMIT=${BASH_REMATCH[1]} # Only the value for the PHP memory_limit
 
 PHPCONFALPHREGEX="([A-Za-z]).*$"
-#[[ $PHPGLOBALCONF =~ ([A-Za-z]).*$ ]] &&
 [[ $PHPGLOBALCONF =~ $PHPCONFALPHREGEX ]] &&
 PHPMEMLIMITDENOM=${BASH_REMATCH[1]} # The memory denomination being used
-
-# ************************************************************************************************************
-# **NOTE** this does NOT (yet) know if the memory limit is using M or G. Thus if a client has a memory_limit
-# of 1 G this will display "1 MB". Logic to correctly determine that is forthcoming / needs to be written
-# ************************************************************************************************************
 
 # Display the PHP memory_limit value
 echo "${PHPINFO}Memory Limit #:${RESET} $PHPMEMLIMIT $PHPMEMLIMITDENOM"
@@ -595,7 +580,7 @@ function apacheinfo {
 
 if [[ -z $CENTOSCHECK ]]; then
 
-	APACHEFULLINFO=$(apache2ctl -V)
+	APACHEFULLINFO=$(apache2ctl -V 2>/dev/null)
 
 # All else fails, we presume we're on a base CentOS install and display accordingly
 else

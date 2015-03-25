@@ -1,3 +1,7 @@
+**1.6.15 -- 3/25/2015**
+
+Corrected an output issue with the apache2ctl command
+
 **1.6.14 -- 3/18/2015**
 
 Corrected a capture error where the PHP memory_limit value was only
