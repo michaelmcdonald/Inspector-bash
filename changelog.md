@@ -1,3 +1,8 @@
+**1.6.17 -- 3/26/2015**
+
+Corrected issue with Varnish commands that were producing no output
+even if Varnish was installed.
+
 **1.6.16 -- 3/25/2015**
 
 Corrected how the key_buffer value was grabbed since a commented out

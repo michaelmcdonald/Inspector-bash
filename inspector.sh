@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.16"
+SCRIPTVERSION="v1.6.17"
 
 
 ##################################################################################
@@ -1095,18 +1095,18 @@ UBUNTUCHECK=$(cat /etc/lsb-release 2>/dev/null)
 
 if [[ -z $UBUNTUCHECK ]]; then
 
-	#VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>/dev/null)
-	VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>&1)
+	VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>&1)
+	#VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>&1)
 
 else
 	# Tests to see if Varnish is present and if so records the version string
-	#VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>/dev/null)
-	VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>&1)
+	VARNISHVOUTPUT=$(/opt/varnish/sbin/varnishd -V 2>&1)
+	#VARNISHVOUTPUT=$(/usr/sbin/varnishd -V 2>&1)
 
 fi
 
 ## Grab the version of Varnish currently installed on the system
-VARNISHREGEX="(([0-9])\.([0-9]+)\.([0-9]+)).*$"
+VARNISHREGEX="(([0-9]+)\.([0-9]+)\.([0-9]+)).*$"
 [[ $VARNISHVOUTPUT =~ $VARNISHREGEX ]] &&
 VARNISHENTIREVERSION=${BASH_REMATCH[1]} && # The whole version #: x.x.xx
 VARNISHMAJORVERSION=${BASH_REMATCH[2]} &&  # The major version #: x
