@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.17"
+SCRIPTVERSION="v1.6.18"
 
 
 ##################################################################################
@@ -431,11 +431,12 @@ fi
 
 ########## MYISAM KEY BUFFER SIZE LOGIC ###############
 
-# Search the $MYSQLCONF variable for the InnoDB Buufer Pool variable. This is just goign to identify if it's there or not
+# Search the $MYSQLCONF variable for the InnoDB Buufer Pool variable. This is just going to identify if it's there or not
 MYISAMPRESENT=$(awk '/^key_buffer/' <<< "$MYSQLCONF")
 
 # This will take the value that's assigned to the InnoDB Buffer Pool (should it exist) and store the value
-MYISAMVALUE=$(awk -F"=" '/^key_buffer/ {print $2}'i <<< "$MYSQLCONF")
+MYISAMVALUE=$(awk -F"=" '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /^key_buffer/ {print $2}'i <<< "$MYSQLCONF")
+#MYISAMVALUE=$(awk -F"=" '/^key_buffer/ {print $2}'i <<< "$MYSQLCONF")
 
 # Grabs just the value for the buffer pool
 MYISAMVALNUMREGEX="(([0-9]+)).*$"

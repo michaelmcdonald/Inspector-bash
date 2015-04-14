@@ -1,3 +1,8 @@
+**1.6.18 -- 4/14/2015**
+
+Corrected awk command to grab MyISAM key_buffer if there is leading
+whitespace(s).
+
 **1.6.17 -- 3/26/2015**
 
 Corrected issue with Varnish commands that were producing no output
