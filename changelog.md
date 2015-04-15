@@ -1,3 +1,8 @@
+**1.6.19 -- 4/15/2015**
+
+Correct regex / command used to acquire the Apache version so it would
+work with Apache 1.3
+
 **1.6.18 -- 4/14/2015**
 
 Corrected awk command to grab MyISAM key_buffer if there is leading

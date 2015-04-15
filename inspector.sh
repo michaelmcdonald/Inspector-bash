@@ -15,7 +15,7 @@
 ##################################################################################
 
 # Quick place to set the script's version number (adjusts the header version too)
-SCRIPTVERSION="v1.6.18"
+SCRIPTVERSION="v1.6.19"
 
 
 ##################################################################################
@@ -601,7 +601,8 @@ NETSTATINFO=$(netstat -nap 2>/dev/null)
 #NUMOFCONNS=$(awk '/:80/ {++c} END {print c}' <<< "$NETSTATINFO")
 
 # Get the entire Apache version number from the string in the $APACHEINFO variable
-APACHEVERSION=$(awk -F[/\ ] '/Server version/ {print $4}'i <<< $APACHEFULLINFO)
+APACHEVERSION=$(/etc/init.d/httpd status | awk '/Server Version/ {print}')
+#APACHEVERSION=$(awk -F[/\ ] '/Server version/ {print $4}'i <<< $APACHEFULLINFO)
 
 # Get the currently used MPM
 APACHEMPM=$(awk -F[:] '{gsub(/^[ \t]+|[ \t]+$/, "", $2)} /Server MPM/ {print $2}'x <<< "$APACHEFULLINFO")
